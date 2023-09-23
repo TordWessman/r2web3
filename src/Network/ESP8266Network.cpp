@@ -1,15 +1,14 @@
-#ifdef ARDUINO
-#include "ESP8266Client.h"
+#include "ESP8266Network.h"
 #include <Arduino.h>
 
 namespace blockchain
 {
-    ESP8266Client::ESP8266Client()
+    ESP8266Network::ESP8266Network()
     {
         http.addHeader("Content-Type", "application/json");
     }
 
-    HttpResponse ESP8266Client::MakeRequest(const char *url, const char *method, const char *body) const
+    HttpResponse ESP8266Network::MakeRequest(const char *url, const char *method, const char *body) const
     {
         String urlString = url;
         http.begin(client, urlString);
@@ -29,4 +28,3 @@ namespace blockchain
         return HttpResponse(httpResponseCode, responseData);
     }
 }
-#endif

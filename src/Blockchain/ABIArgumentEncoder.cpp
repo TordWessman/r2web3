@@ -49,7 +49,6 @@ namespace blockchain
         return ARGUMENT_LENGTH;
     }
 
-
     std::vector<uint8_t> ABIArgumentEncoder::Encode(const EncodableItem *item) const
     {
         std::vector<uint8_t> encoded(getVectorSize(item), 0);
