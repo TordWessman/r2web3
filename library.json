@@ -1,0 +1,51 @@
+{
+    "name": "r2web3",
+    "description": "A simple Web3 client for microcontrollers",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/TordWessman/r2web3"
+    },
+    "version": "0.0.1",
+    "authors": [
+      {
+        "name": "TordWessman",
+        "email": "tord@axelit.se",
+        "url": "https://axelit.se/"
+      }
+    ],
+    "includeDir": "src",
+    "srcDir": "src",
+    "frameworks": "arduino",
+    "platforms": [
+      "espressif8266",
+      "espressif32",
+      "atmelsam"
+    ],
+    "export": {
+      "include": [
+        "src/*"
+        "examples/*",
+        "*.md",
+        "*.properties",
+        "LICENSE",
+      ],
+      "exclude": [
+        
+      ]
+    },
+    "build": {
+        "flags":
+        [
+            "-I src",
+            "-I src/Shared",
+            "-I src/Blockchain",
+            "-I src/Network"
+        ],
+        "srcFilter": 
+        [
+          "+<*>",
+        ],
+        "libCompatMode": "strict"
+    },
+    "libLDFMode": "deep+"
+  }
