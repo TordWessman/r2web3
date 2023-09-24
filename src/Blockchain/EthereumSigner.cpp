@@ -47,9 +47,6 @@ namespace blockchain
             v = v + transaction->Properties().chainId * 2 + 0x23;
         }
 
-        //Log::m("r: ", signatureOriginal.r);
-        //Log::m("s: ", signatureOriginal.v);
-        Log::m("v: ", v);
         EthereumSignature signature = EthereumSignature(v, signatureOriginal.r, signatureOriginal.s);
 
         return EthereumTransaction(transaction->Properties(), signature);
