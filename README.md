@@ -1,9 +1,9 @@
 # r2web3
-A Web3 library inteded to be used for microcontrollers. Has at this point only ben tested on ESP8266 boards.
+A Web3 library intended to be used for microcontrollers. Has at this point only been tested on ESP8266 boards.
 
-This project is - in it's current stage - incomplete and more of a mean serving me to learn about blockchain development. Here's a list of a few thing that's on the initial roadmap:
+This project is - in its current stage - incomplete and more of means serving me to learn about blockchain development. Here's a list of a few thing that's on the initial roadmap:
  * Parse errors correctly
- * Clean up network layer
+ * Clean up network requests
  * Unit tests
  * ABI encoding (existing, but incomplete)
  * ABI decoding (not implemented)
@@ -36,7 +36,7 @@ using namespace blockchain;
 Account account(PRIVATE_KEY);
 Address contractAddress(CONTRACT_ADDRESS);
 ESP8266Network networkFacade; // Use the ESP8266 network stack.
-Chain chain("http://<computer ip-address>:8545", &networkFacade); //Local ganache instance
+Chain chain("http://<computer ip-address>:8545", &networkFacade); //Local Ganache instance
 
 void(* restartDevice) (void) = 0; 
 
@@ -93,7 +93,7 @@ void viewCall() {
 
 /// Contract call, creating a block.
 void mutateCall() {
-    ContractCall contractCall("setFoo", {ENC((uint32_t)random(1000,10000))}); //Equivalent to method signature 'setFoo(uint256y)'
+    ContractCall contractCall("setFoo", {ENC((uint32_t)random(1000,10000))}); //Equivalent to method signature 'setFoo(uint256)'
     BigUnsigned gasPrice(1234567); // Could be calculated using 'eth_estimateGas' once implemented.
     BigUnsigned sendAmount = BigUnsigned(0u);
     uint32_t gasLimit = 6721975;
