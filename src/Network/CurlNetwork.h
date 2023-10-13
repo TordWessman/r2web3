@@ -17,6 +17,9 @@ namespace blockchain
 
         HttpResponse MakeRequest(const char *url, const char *method, const char *body) const override;
 
+        CurlNetwork &operator=(const CurlNetwork &) = delete;
+        CurlNetwork(const CurlNetwork &other) = delete;
+
     private:
         CURL *curlHandle;
         static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp);

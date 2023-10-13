@@ -51,17 +51,16 @@ namespace blockchain
             return Result<char *>::Err(response.status, "HTTP Error");
         }
 
-        cJSON *response_json = cJSON_Parse(response.body);
-
+        cJSON *response_json = NULL; 
+        if (response.body != nullptr) { response_json = cJSON_Parse(response.body); }
+        
         if (response_json == NULL)
         {
-            cJSON_Delete(response_json);
             const char *errorPtr = cJSON_GetErrorPtr();
-            if (errorPtr != NULL)
-            {
-                Log::m("Unable to parse:", errorPtr);
-                return Result<char *>::Err(-2, "Error parsing response as JSON");
-            }
+            if (errorPtr != NULL) { Log::m("Unable to parse:", errorPtr); }
+            else { Log::m("Unable to parse. Null response?"); }
+            
+            return Result<char *>::Err(-2, "Error parsing response as JSON");
         }
         else
         {
