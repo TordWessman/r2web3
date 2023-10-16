@@ -57,6 +57,16 @@ namespace blockchain
         #endif
     }
 
+    void Log::m(const char *m1, char *m2) 
+    {
+        if (LOGGING_DISABLED) { return; }
+        #ifdef ARDUINO
+            Serial.print(m1); Serial.println(m2);
+        #else
+            std::cout << m1 << " " << m2 << std::endl;
+        #endif
+    }
+
     void Log::m(const char *m1, int m2) 
     {
         if (LOGGING_DISABLED) { return; }
@@ -115,6 +125,12 @@ namespace blockchain
                     return std::vector<uint8_t>(v.begin() + zeroCount, v.end());
                 }
             }
+            
+            if (zeroCount == v.size()) 
+            {
+                return std::vector<uint8_t>();
+            }
+            
             return v;
         }
 

@@ -25,6 +25,7 @@ namespace blockchain
         static void m();
         static void m(const char *m1);
         static void m(const char *m1, const char *m2);
+        static void m(const char *m1, char *m2);
         static void m(const char *m1, int m2);
         static void m(const char *m1, uint32_t m2);
         // template <typename T, typename... Args>
@@ -52,7 +53,7 @@ namespace blockchain
         /// @return
         static Result<T> Err(int errorCode, const char *errorMessage) { return Result<T>(errorCode, errorMessage); }
 
-        /// @brief Returns `true` if the result was a "success".
+        /// @brief Returns `true` if the result was "successful".
         /// @return
         bool HasValue() const { return hasValue; }
 
