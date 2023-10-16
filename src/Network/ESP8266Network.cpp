@@ -6,10 +6,12 @@
 
 namespace blockchain
 {
-    
-    ESP8266Network::ESP8266Network(const char *certificate) : client()
+
+    ESP8266Network::ESP8266Network(const char *certificate)
     {
         http.addHeader("Content-Type", "application/json");
+        
+        ntpServers = {ESP8266Network_NTP_SERVER1, ESP8266Network_NTP_SERVER2, ESP8266Network_NTP_SERVER3};
 
         if (certificate != nullptr) 
         {
@@ -17,11 +19,12 @@ namespace blockchain
             trustedCAs.append(certificate);
             bearSSLClient->setTrustAnchors(&trustedCAs);
             client = bearSSLClient;
+            timeSyncRequired = true;
         }
         else
         {
             client = new WiFiClient();
-            started = true;
+            timeSyncRequired = false;
         }
     }
 
@@ -29,25 +32,42 @@ namespace blockchain
     {
         http.addHeader("Content-Type", "application/json");
 
+        ntpServers = {ESP8266Network_NTP_SERVER1, ESP8266Network_NTP_SERVER2, ESP8266Network_NTP_SERVER3};
+
         if (certificates.size() > 0)
         {
             BearSSL::WiFiClientSecure *bearSSLClient = new BearSSL::WiFiClientSecure();
             for (const char *certificate : certificates) { trustedCAs.append(certificate); }
             bearSSLClient->setTrustAnchors(&trustedCAs);
             client = bearSSLClient;
+            timeSyncRequired = true;
         }
         else
         {
             client = new WiFiClient();
-            started = true;
+            timeSyncRequired = false;
         }
     }
 
-    bool ESP8266Network::Restart(const char *ntpServer1, const char *ntpServer2, const char *ntpServer3)
+    void ESP8266Network::SetNtpServers(const char *ntpServer1, const char *ntpServer2, const char *ntpServer3)
     {
-        if (SetClock(ntpServer1, ntpServer2, ntpServer3)) 
+        if (ntpServer1 == nullptr && ntpServer2 == nullptr && ntpServer3 == nullptr)
         {
-            started = true;
+            ntpServers = {ESP8266Network_NTP_SERVER1, ESP8266Network_NTP_SERVER2, ESP8266Network_NTP_SERVER3};
+        }
+        else
+        {
+            ntpServers[0] = ntpServer1;
+            ntpServers[1] = ntpServer2;
+            ntpServers[2] = ntpServer3;
+        }
+    }
+
+    bool ESP8266Network::Restart() const
+    {
+        if (ESP8266Network::SetClock(ntpServers[0], ntpServers[1], ntpServers[2]))
+        {
+            timeSyncRequired = false;
             return true;
         }
         return false;
@@ -55,15 +75,18 @@ namespace blockchain
 
     HttpResponse ESP8266Network::MakeRequest(const char *url, const char *method, const char *body) const
     {
-        if (!started)
+        if (timeSyncRequired)
         { 
-            Log::m("NTP time synchronization required. Call `Restart` once network is connected.");
-            return HttpResponse(-2, nullptr);
+            if (!Restart()) 
+            {
+                Log::m("NTP time synchronization failed. Call `Restart` once network is connected.");
+                return HttpResponse(-2, nullptr);
+            }
         }
 
         if (strncmp(url, "https", 5) == 0 && trustedCAs.getCount() == 0) 
         {
-            Log::m("Trying to initiate a https connection without a valid certificate. Instantiate ESP8266Network with a valid root certificate.");
+            Log::m("Trying to initiate a https connection without a valid certificate. Instantiate ESP8266Network with valid root certificate(s).");
             return HttpResponse(-3, nullptr);
         }
 
@@ -89,7 +112,7 @@ namespace blockchain
 
     bool ESP8266Network::SetClock(const char *ntpServer1, const char *ntpServer2, const char *ntpServer3)
     {
-        configTime(0, 0, ESP8266Network_NTP_SERVER1, ESP8266Network_NTP_SERVER2, ESP8266Network_NTP_SERVER3);
+        configTime(0, 0, ntpServer1, ntpServer2, ntpServer3);
 
         Log::m("Waiting for NTP time sync: ");
         time_t now = time(nullptr);

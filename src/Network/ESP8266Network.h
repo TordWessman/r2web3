@@ -38,10 +38,12 @@ namespace blockchain
             delete client;
         }
 
-        /// @brief Invoke once WiFi connection has been established (only required if `ESP8266Network` has been instantiated with certificates).
         /// Allows for up to 3 optional NTP servers (ignore if default, hardcoded NTP server defined by `ESP8266Network_NTP_SERVERS` should be used)
+        void SetNtpServers(const char *ntpServer1 = nullptr, const char *ntpServer2 = nullptr, const char *ntpServer3 = nullptr);
+
+        /// @brief Invoke once WiFi connection has been established (only required if `ESP8266Network` has been instantiated with certificates).
         /// @return true if NTP time was successfully fetched.
-        bool Restart(const char *ntpServer1 = nullptr, const char *ntpServer2 = nullptr, const char *ntpServer3 = nullptr);
+        bool Restart() const;
 
         HttpResponse MakeRequest(const char *url, const char *method, const char *body) const override;
 
@@ -49,11 +51,12 @@ namespace blockchain
         ESP8266Network(const ESP8266Network &other) = delete;
 
     private:
-        bool started;
+        mutable bool timeSyncRequired;
         mutable HTTPClient http;
         mutable WiFiClient *client;
         mutable BearSSL::X509List trustedCAs;
-        bool SetClock(const char *ntpServer1 = nullptr, const char *ntpServer2 = nullptr, const char *ntpServer3 = nullptr);
+        std::vector<const char*> ntpServers;
+        static bool SetClock(const char *ntpServer1 = nullptr, const char *ntpServer2 = nullptr, const char *ntpServer3 = nullptr);
     };
     
 }

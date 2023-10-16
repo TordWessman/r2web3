@@ -111,7 +111,7 @@ void loop() {
 ## Secure connection (HTTPS)
 When accessing a HTTP over TLS, one must specify the root certificate for the endpoint when instantiating the `ESP8266Network`.
 
-Note that `Restart()` method must be called once WiFi connection has been eshablished.
+Note that `Restart()` method must be called once the WiFi connection has been established _if_ the device clock has lost synchronization (e g after suspension).
 
 ```
 const char publicnode_cert [] PROGMEM = R"CERT(
@@ -155,9 +155,9 @@ Chain chain("https://ethereum.publicnode.com", &networkFacade); // Only RPC-urls
 
 void Setup() {
 
-  // Connect to WiFi ...
+  // <... Connect to WiFi ...>
 
-  networkFacade.Restart();
+  networkFacade.Restart(); // Only required if device clock needs to be synchronized.
 } 
 ``` 
 There are several ways to retrieve the certificate, and here's one:
