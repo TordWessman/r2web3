@@ -173,7 +173,9 @@ namespace blockchain
     {
         AssertStarted();
         Result<BigUnsigned> nonceResult = GetTransactionCount(from);
-        if (!nonceResult.HasValue())  {
+        
+        if (!nonceResult.HasValue())
+        {
             return Result<TransactionResponse>::Err(-1, "Unable to retrieve nonce.");
         }
 
@@ -185,11 +187,12 @@ namespace blockchain
         
         EthereumTransaction tx = transactionFactory->GenerateTransaction(p, &pk);
         
-        std::vector<uint8_t> vvvv = tx.Serialize();
+        std::vector<uint8_t> serializedTransaction = tx.Serialize();
         
         cJSON *params = cJSON_CreateArray();
-        char *parameter = (vvvv | byte_array::hex_string) | char_string::add_hex_prefix;
-        cJSON_AddItemToArray(params, cJSON_CreateString(parameter)); //parameter.c_str()
+        char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
+
+        cJSON_AddItemToArray(params, cJSON_CreateString(parameter));
         delete[] parameter;
 
         char *request_body = BaseJsonBody("eth_sendRawTransaction", params);
