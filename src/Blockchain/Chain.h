@@ -93,8 +93,8 @@ namespace blockchain
 
         /// @brief Returns the balance (in gwei) for the provided `account`.
         /// @param account 
-        /// @return 
-        Result<BigUnsigned> GetBalance(const Account *account) const;
+        /// @return
+        Result<BigUnsigned> GetBalance(const Address &address) const;
 
         /// @brief Execute a message call without creating a transaction on the block chain.
         /// @param contractCall Method exectution information

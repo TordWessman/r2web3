@@ -52,7 +52,7 @@ namespace blockchain
         }
 
         cJSON *response_json = NULL; 
-        if (response.body != nullptr) { response_json = cJSON_Parse(response.body); }
+        if (response.GetBody() != nullptr) { response_json = cJSON_Parse(response.GetBody()); }
         
         if (response_json == NULL)
         {
@@ -191,7 +191,6 @@ namespace blockchain
         
         cJSON *params = cJSON_CreateArray();
         char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
-
         cJSON_AddItemToArray(params, cJSON_CreateString(parameter));
         delete[] parameter;
 
@@ -228,11 +227,11 @@ namespace blockchain
         return Result<BigUnsigned>::Err(result.ErrorCode());
     }
 
-    Result<BigUnsigned> Chain::GetBalance(const Account *account) const {
+    Result<BigUnsigned> Chain::GetBalance(const Address &address) const {
         AssertStarted();
         cJSON *params = cJSON_CreateArray();
 
-        cJSON_AddItemToArray(params, cJSON_CreateString(account->GetAddress().AsString()));
+        cJSON_AddItemToArray(params, cJSON_CreateString(address.AsString()));
         cJSON_AddItemToArray(params, cJSON_CreateString("latest"));
 
         char* request_body = BaseJsonBody("eth_getBalance", params);

@@ -80,22 +80,22 @@ namespace blockchain
             if (!Restart()) 
             {
                 Log::m("NTP time synchronization failed. Call `Restart` once network is connected.");
-                return HttpResponse(-2, nullptr);
+                return HttpResponse(-2);
             }
         }
 
         if (strncmp(url, "https", 5) == 0 && trustedCAs.getCount() == 0) 
         {
             Log::m("Trying to initiate a https connection without a valid certificate. Instantiate ESP8266Network with valid root certificate(s).");
-            return HttpResponse(-3, nullptr);
+            return HttpResponse(-3);
         }
 
-        String urlString = url;
-        http.begin(*client, urlString);
+        http.begin(*client, url);
         int httpResponseCode = http.sendRequest(method, (const uint8_t *)body, strlen(body));
         if (httpResponseCode != HTTP_CODE_OK)
         {
             Log::m("Invalid response code: ", httpResponseCode);
+            Log::m(http.getString().c_str());
         }
 
         String responseBody = http.getString();

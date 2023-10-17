@@ -28,7 +28,7 @@ namespace blockchain
         if (!curlHandle)
         {
             THROW("Failed to initialize cURL.");
-            return HttpResponse(-1, nullptr);
+            return HttpResponse(-1);
         }
 
         curl_easy_setopt(curlHandle, CURLOPT_URL, url);
