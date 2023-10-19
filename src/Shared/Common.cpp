@@ -163,7 +163,7 @@ namespace blockchain
 
             for (size_t i = 0; i < v.size(); i++)
             {
-            str[i] = (char)v[i];
+                str[i] = (char)v[i];
             }
             return str;
         }
