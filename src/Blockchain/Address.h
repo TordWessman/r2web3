@@ -2,8 +2,6 @@
 #define __ADDRESS__H__
 
 #include <vector>
-#include <cstring>
-#include <iostream>
 
 namespace blockchain
 {       

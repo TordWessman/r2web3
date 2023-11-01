@@ -16,5 +16,6 @@
 #include "Blockchain/EthereumTransaction.h"
 #include "Blockchain/EthereumSigner.h"
 #include "Blockchain/ABIArgumentEncoder.h"
+#include "Blockchain/ABIDecoder.h"
 
 #endif

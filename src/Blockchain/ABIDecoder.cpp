@@ -1,5 +1,5 @@
 #include "ABIDecoder.h"
-#include "Common.h"
+#include "../Shared/Common.h"
 
 namespace blockchain
 {
