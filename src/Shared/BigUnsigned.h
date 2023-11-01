@@ -12,8 +12,8 @@ namespace blockchain
     {
 
     public:
-        /// @brief Value will be 0.
-        BigUnsigned() {}
+        /// @brief VUndefined value
+        BigUnsigned() : hexString(nullptr) {}
 
         /// @brief Constructor using a hexadecimal string.
         /// @param value A hex-string with - or without the "0x" prefix.
