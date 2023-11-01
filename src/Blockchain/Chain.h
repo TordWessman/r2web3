@@ -98,10 +98,11 @@ namespace blockchain
 
         /// @brief Execute a message call without creating a transaction on the block chain.
         /// @param contractCall Method exectution information
+        /// @param contractAddress Address of the caller.
         /// @param contractAddress Contract address.
         /// @return
-        Result<TransactionResponse> ViewCall(const ContractCall *contractCall, const Address &contractAddress) const;
-        
+        Result<TransactionResponse> ViewCall(const ContractCall *contractCall, const Address &callerAddress, const Address &contractAddress) const;
+
         /// @brief Return the number of transactions made. Used for calculating nonce.
         /// @param account 
         /// @return 

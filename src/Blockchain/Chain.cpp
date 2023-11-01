@@ -140,15 +140,16 @@ namespace blockchain
         return Result<BigUnsigned>::Err(result.ErrorCode());
     }
 
-    Result<TransactionResponse> Chain::ViewCall(const ContractCall *contractCall, const Address &contractAddress) const
+    Result<TransactionResponse> Chain::ViewCall(const ContractCall *contractCall, const Address &callerAddress, const Address &contractAddress) const
     {
         AssertStarted();
         cJSON *callCJson = cJSON_CreateObject();
         cJSON *params = cJSON_CreateArray();
 
-        cJSON_AddNullToObject(callCJson, "from");
+        cJSON_AddStringToObject(callCJson, "from", callerAddress.AsString());
         cJSON_AddStringToObject(callCJson, "to", contractAddress.AsString());
         char *dataAsHexString = (contractCall->AsData() | byte_array::hex_string) | char_string::add_hex_prefix;
+        
         cJSON_AddStringToObject(callCJson, "data", dataAsHexString);
         free(dataAsHexString);
         cJSON_AddItemToArray(params, callCJson);
