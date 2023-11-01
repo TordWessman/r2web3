@@ -2,7 +2,6 @@
 
 #include "CurlNetwork.h"
 #include "HttpResponse.h"
-#include "../Shared/Common.h"
 
 namespace blockchain
 {
