@@ -52,7 +52,10 @@ namespace blockchain
         {
             const size_t len = (ETH_ADDRESS_LENGTH - 2) / 2;
             assert(bytes->size() >=  len);
-            std::copy(bytes->begin() + bytes->size() - len, bytes->end() - len, address);
+            for(size_t i = 0; i < bytes->size(); i++)
+            {
+                address[2 + i] = bytes->at(i);
+            }
             address[ETH_ADDRESS_LENGTH] = '\0';
             address[0] = '0'; address[1] = 'x';
         }
