@@ -2,7 +2,7 @@
 #define __R2_WEB3_H__
 
 #include "Shared/Common.h"
-#include "Network/ESP8266Network.h"
+#include "Network/ESPNetwork.h"
 #include "Network/NetworkFacade.h"
 #include "Shared/BigUnsigned.h"
 #include "Blockchain/Address.h"
