@@ -12,24 +12,23 @@ namespace blockchain
     {
     public:
 
+        /// @brief Creates a response without a body. `GetBody()` will return `nullptr`.
+        HttpResponse(const long status) : status(status), responseLength(0), body(nullptr) { }
+
         /// @brief Creates a response object. Please note that `responseBody` will be managed by this instance and must therefore not be deallocated separately.
-        HttpResponse(const long status, char *responseBody = nullptr) : 
+        HttpResponse(const long status, char *responseBody) : 
             status(status),
-            responseLength((body != nullptr && strlen(body) != 0) ? strlen(body) + 1 : 0),
+            responseLength(strlen(responseBody) + 1),
             body(responseBody) { }
 
         /// @brief Creates a response object by copying the contents of `responseBody`.
         HttpResponse(const long status, const char *responseBody) : 
             status(status),
-            responseLength(strlen(body) != 0 ? strlen(body) + 1 : 0)
+            responseLength(strlen(responseBody) != 0 ? strlen(responseBody) + 1 : 0)
         { 
-            if(responseBody != nullptr) 
-            {
-                body = new char[strlen(responseBody) + 1];
-                body[strlen(responseBody)] = '\0';
-                memcpy(body, responseBody, strlen(responseBody));
-            }
-            else { body = nullptr; }
+            body = new char[strlen(responseBody) + 1];
+            body[strlen(responseBody)] = '\0';
+            memcpy(body, responseBody, strlen(responseBody));
         }
 
         ~HttpResponse()
@@ -44,10 +43,18 @@ namespace blockchain
         {
             if (this != &other)
             {
-                delete body;
-                body = new char[strlen(other.body) + 1];
-                body[strlen(other.body)] = '\0';
-                memcpy(body, other.body, strlen(other.body));
+                if (body != nullptr) { delete body; }
+
+                if (other.body != nullptr)
+                {
+                    body = new char[strlen(other.body) + 1];
+                    body[strlen(other.body)] = '\0';
+                    memcpy(body, other.body, strlen(other.body));
+                }
+                else
+                {
+                    body = nullptr;
+                }
             }
             return *this;
         }
@@ -58,9 +65,16 @@ namespace blockchain
         {
             if (this != &other)
             {
-                body = new char[strlen(other.body) + 1];
-                body[strlen(other.body)] = '\0';
-                memcpy(body, other.body, strlen(other.body));
+                if (other.body != nullptr)
+                {
+                    body = new char[strlen(other.body) + 1];
+                    body[strlen(other.body)] = '\0';
+                    memcpy(body, other.body, strlen(other.body));
+                }
+                else
+                {
+                    body = nullptr;
+                }
             }
         }
 
@@ -78,7 +92,6 @@ namespace blockchain
         
     private:
         char *body;
-            
     };
 }
 #endif
