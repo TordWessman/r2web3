@@ -133,6 +133,12 @@ namespace blockchain
         return removeLeadingZeros(resultString);
     }
 
+    BigUnsigned::BigUnsigned()
+    {
+        hexString = new char[1];
+        hexString[0] = '\n';
+    }
+
     BigUnsigned::BigUnsigned(uint32_t value)
     {
         data.insert(data.begin(), value & 0xFFFF);
