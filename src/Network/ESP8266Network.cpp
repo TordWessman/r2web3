@@ -9,8 +9,6 @@ namespace blockchain
 
     ESP8266Network::ESP8266Network(const char *certificate)
     {
-        http.addHeader("Content-Type", "application/json");
-        
         ntpServers = {ESP8266Network_NTP_SERVER1, ESP8266Network_NTP_SERVER2, ESP8266Network_NTP_SERVER3};
 
         if (certificate != nullptr) 
@@ -30,8 +28,6 @@ namespace blockchain
 
     ESP8266Network::ESP8266Network(std::vector<const char *> certificates)
     {
-        http.addHeader("Content-Type", "application/json");
-
         ntpServers = {ESP8266Network_NTP_SERVER1, ESP8266Network_NTP_SERVER2, ESP8266Network_NTP_SERVER3};
 
         if (certificates.size() > 0)
@@ -89,8 +85,10 @@ namespace blockchain
             Log::m("Trying to initiate a https connection without a valid certificate. Instantiate ESP8266Network with valid root certificate(s).");
             return HttpResponse(-3);
         }
+        
 
         http.begin(*client, url);
+        http.addHeader("Content-Type", "application/json");
         int httpResponseCode = http.sendRequest(method, (const uint8_t *)body, strlen(body));
         if (httpResponseCode != HTTP_CODE_OK)
         {
