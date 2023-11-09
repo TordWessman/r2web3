@@ -67,14 +67,14 @@ namespace blockchain
         { 
             if (!Restart()) 
             {
-                Log::m("NTP time synchronization failed. Call `Restart` once network is connected.");
+                Log::e("NTP time synchronization failed. Call `Restart` once network is connected.");
                 return HttpResponse(-2);
             }
         }
 
         if (strncmp(url, "https", 5) == 0 && !caCertAdded)
         {
-            Log::m("Trying to initiate a https connection without a valid certificate. Instantiate ESPNetwork with a valid root certificate.");
+            Log::e("Trying to initiate a https connection without a valid certificate. Instantiate ESPNetwork with a valid root certificate.");
             return HttpResponse(-3);
         }
 
@@ -85,12 +85,12 @@ namespace blockchain
 
         if (httpResponseCode < 100)
         {
-            Log::m("Connection error with code: ", httpResponseCode);
+            Log::e("Connection error with code: ", httpResponseCode);
             return HttpResponse(httpResponseCode);
         }
         else if (httpResponseCode != HTTP_CODE_OK)
         {
-            Log::m("Invalid response code: ", httpResponseCode);
+            Log::e("Invalid response code: ", httpResponseCode);
             Log::m(http.getString().c_str());
         }
 
@@ -122,7 +122,7 @@ namespace blockchain
 
         if (retryCount >= ESPNetwork_NTP_LOOP_RETRIES) 
         {
-            Log::m("Unable to fetch NPT time");
+            Log::e("Unable to fetch NPT time");
             return false;
         }
 

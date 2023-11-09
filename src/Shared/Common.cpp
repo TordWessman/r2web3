@@ -204,10 +204,9 @@ namespace blockchain
 
 void _throwException_arduino(const char *message)
 {
-    if (!LOGGING_DISABLED)
-    {
-        Serial.println(message);
-    }
+#ifdef R2WEB3_LOGGING_DISABLED
+    Serial.println(message);
+#endif
     assert(false);
 }
 

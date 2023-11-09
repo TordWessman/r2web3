@@ -12,7 +12,7 @@ namespace blockchain
             if (chainIdResult.HasValue()) { id = chainIdResult.Value(); } 
             else 
             {
-                Log::m("Unable to fetch chainId");
+                Log::e("Unable to fetch chainId");
                 return false;
             }
         }
@@ -58,8 +58,8 @@ namespace blockchain
         if (response_json == NULL)
         {
             const char *errorPtr = cJSON_GetErrorPtr();
-            if (errorPtr != NULL) { Log::m("Unable to parse:", errorPtr); }
-            else { Log::m("Unable to parse. Null response?"); }
+            if (errorPtr != NULL) { Log::e("Unable to parse:", errorPtr); }
+            else { Log::e("Unable to parse. Null response?"); }
             
             return Result<char *>::Err(-2, "Error parsing response as JSON");
         }
@@ -84,16 +84,16 @@ namespace blockchain
             {
                 char *json_str = cJSON_Print(resultJson);
                 Result<char *> result = Result<char *>::Err(-1, "Unable to parse `error` from JSON.");
-                Log::m("JSON ERROR", json_str);
+                Log::e("JSON ERROR", json_str);
                 cJSON_Delete(response_json);
                 cJSON_free(json_str);
                 return result;
             }
-            else { Log::m("No 'error'. No 'result'"); }
+            else { Log::e("No 'error'. No 'result'"); }
         }
 
         cJSON_Delete(response_json);
-        Log::m("JSON ERROR", cJSON_Print(response_json));
+        Log::e("JSON ERROR", cJSON_Print(response_json));
         return Result<char *>::Err(-3, "Invalid JSON");
     }
 

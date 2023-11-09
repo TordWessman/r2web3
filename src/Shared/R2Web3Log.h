@@ -1,6 +1,8 @@
 #ifndef __R2Web3Log_H__
 #define __R2Web3Log_H__
 
+#include <stdint.h>
+
 namespace blockchain
 {
 
@@ -16,7 +18,7 @@ namespace blockchain
         virtual void log(const int logType, const char *m1, const uint32_t m2) { }
     };
 
-    /// @brief Logger. Allows the framework to print out debug information. Disable by setting the `LOGGING_DISABLED` flag to `true` in `configuration.h`
+    /// @brief Logger. Allows the framework to print out debug information. Disable tracking by defining `R2WEB3_LOGGING_DISABLED` in `configuration.h`
     class Log
     {
 
