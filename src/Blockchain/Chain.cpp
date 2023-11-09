@@ -1,5 +1,6 @@
 #include "Chain.h"
 #include "../Network/HttpRequest.h"
+#include "../Shared/R2Web3Log.h"
 
 namespace blockchain
 {

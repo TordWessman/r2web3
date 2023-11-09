@@ -17,20 +17,6 @@
 
 namespace blockchain
 {
-    /// @brief Logger. Allows the framework to print out debug information. Disable by setting the `LOGGING_DISABLED` flag to `true` in `configuration.h`
-    class Log
-    {
-
-    public:
-        static void m();
-        static void m(const char *m1);
-        static void m(const char *m1, const char *m2);
-        static void m(const char *m1, char *m2);
-        static void m(const char *m1, int m2);
-        static void m(const char *m1, uint32_t m2);
-        // template <typename T, typename... Args>
-        // static void m(const T &value, Args... args);
-    };
 
     /// @brief A simple enumeration for wrapping an "optional" value as a "success" or "failure".
     /// The value contained is not memory managed and might have to be manually deallocated.

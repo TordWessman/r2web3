@@ -2,6 +2,7 @@
 #define __R2_WEB3_H__
 
 #include "Shared/Common.h"
+#include "Shared/R2Web3Log.h"
 #include "Network/ESPNetwork.h"
 #include "Network/NetworkFacade.h"
 #include "Shared/BigUnsigned.h"

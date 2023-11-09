@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <string.h>
 
-#include "../Shared/Common.h"
+#include "../Shared/R2Web3Log.h"
 
 namespace blockchain
 {
