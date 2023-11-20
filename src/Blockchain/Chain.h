@@ -96,6 +96,12 @@ namespace blockchain
         /// @return
         Result<BigUnsigned> GetBalance(const Address &address) const;
 
+        /// @brief Returns the balance of an ERC20-contract address
+        /// @param address 
+        /// @param contractAddress 
+        /// @return 
+        Result<BigUnsigned> GetBalance(const Address &address, const Address &contractAddress) const;
+
         /// @brief Execute a message call without creating a transaction on the block chain.
         /// @param contractCall Method exectution information
         /// @param contractAddress Address of the caller.

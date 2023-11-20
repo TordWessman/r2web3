@@ -12,7 +12,11 @@ namespace blockchain
     class ContractCall 
     {
     public:
-
+        ContractCall(const char *functionName) : functionName(functionName), arguments({})
+        {
+            GenerateSignatureHash();
+        }
+        
         ContractCall(const char *functionName, const std::vector<EncodableItem> arguments) : 
                 functionName(functionName), 
                 arguments(arguments) 

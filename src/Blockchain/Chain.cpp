@@ -117,6 +117,17 @@ namespace blockchain
         return Result<uint32_t>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
+    Result<BigUnsigned> Chain::GetBalance(const Address &address, const Address &contractAddress) const
+    {
+        ContractCall getBalanceCall("balanceOf", {ENC(&address)});
+        Result<TransactionResponse> response = ViewCall(&getBalanceCall, address, contractAddress);
+        if (response.HasValue())
+        {
+            return Result<BigUnsigned>(response.Value().Result());
+        }
+        return Result<BigUnsigned>::Err(response.ErrorCode(), response.ErrorMessage());
+    }
+
     Result<BigUnsigned> Chain::GetTransactionCount(const Account *account) const
     {
         AssertStarted();
