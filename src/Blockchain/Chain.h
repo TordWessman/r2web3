@@ -6,7 +6,7 @@
 
 #include "../Shared/Common.h"
 #include "../Shared/cJSON.h"
-#include "../Shared/BigUnsigned.h"
+#include "../Shared/BigNumber.h"
 #include "../Network/NetworkFacade.h"
 #include "Account.h"
 #include "EthereumSigner.h"
@@ -89,18 +89,18 @@ namespace blockchain
 
         /// @brief Return the current gas price.
         /// @return 
-        Result<BigUnsigned> GetGasPrice() const;
+        Result<BigNumber> GetGasPrice() const;
 
         /// @brief Returns the balance (in gwei) for the provided `account`.
         /// @param account 
         /// @return
-        Result<BigUnsigned> GetBalance(const Address &address) const;
+        Result<BigNumber> GetBalance(const Address &address) const;
 
         /// @brief Returns the balance of an ERC20-contract address
         /// @param address 
         /// @param contractAddress 
         /// @return 
-        Result<BigUnsigned> GetBalance(const Address &address, const Address &contractAddress) const;
+        Result<BigNumber> GetBalance(const Address &address, const Address &contractAddress) const;
 
         /// @brief Execute a message call without creating a transaction on the block chain.
         /// @param contractCall Method exectution information
@@ -112,7 +112,7 @@ namespace blockchain
         /// @brief Return the number of transactions made. Used for calculating nonce.
         /// @param account 
         /// @return 
-        Result<BigUnsigned> GetTransactionCount(const Account *account) const;
+        Result<BigNumber> GetTransactionCount(const Account *account) const;
 
         /// @brief Send a signed transaction. This could either be a transfer or a contract call.
         /// @param from Sender account
@@ -123,7 +123,7 @@ namespace blockchain
         /// @param contractCall Optional parameter. If provided, this `Send` invocation is considered to be a contract execution.
         /// @return The result of the transaction.
         Result<TransactionResponse> Send(const Account *from, const Address &to,
-                                        const BigUnsigned &amount, const BigUnsigned &gasPrice,
+                                        const BigNumber &amount, const BigNumber &gasPrice,
                                         const uint32_t gasLimit, const ContractCall *contractCall = nullptr) const;
         
 

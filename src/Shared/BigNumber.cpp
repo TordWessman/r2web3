@@ -1,7 +1,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "BigUnsigned.h"
+#include "BigNumber.h"
 #include "../Shared/Common.h"
 
 namespace blockchain
@@ -133,13 +133,13 @@ namespace blockchain
         return removeLeadingZeros(resultString);
     }
 
-    BigUnsigned::BigUnsigned()
+    BigNumber::BigNumber()
     {
         hexString = new char[1];
         hexString[0] = '\n';
     }
 
-    BigUnsigned::BigUnsigned(uint32_t value)
+    BigNumber::BigNumber(uint32_t value)
     {
         data.insert(data.begin(), value & 0xFFFF);
         if (value > 0xFFFF)
@@ -149,13 +149,13 @@ namespace blockchain
         GenerateHexString();
     }
 
-    BigUnsigned::BigUnsigned(const std::vector<uint16_t> value)
+    BigNumber::BigNumber(const std::vector<uint16_t> value)
     {
         data = value;
         GenerateHexString();
     }
 
-    BigUnsigned::BigUnsigned(const char *hexString)
+    BigNumber::BigNumber(const char *hexString)
     {
         size_t length = strlen(hexString);
         string_info str(hexString, length);
@@ -185,12 +185,12 @@ namespace blockchain
         GenerateHexString();
     }
 
-    BigUnsigned::BigUnsigned(float toGwei, uint8_t decimals = 18)
+    BigNumber::BigNumber(float toGwei, uint8_t decimals = 18)
     {
         GenerateHexString();
     }
 
-    void BigUnsigned::GenerateHexString()
+    void BigNumber::GenerateHexString()
     {
         const char *hexStringFormat = "%04X";
         size_t length = 2 * data.size() * sizeof(uint16_t) + 1;
@@ -202,7 +202,7 @@ namespace blockchain
         }
     }
 
-    char *BigUnsigned::GenerateDecimalString() const
+    char *BigNumber::GenerateDecimalString() const
     {
         char *decimalString = new char[2];
         decimalString[0] = '0';
@@ -241,7 +241,7 @@ namespace blockchain
         return decimalString;
     }
 
-    std::vector<uint8_t> BigUnsigned::Bytes() const
+    std::vector<uint8_t> BigNumber::Bytes() const
     {
         std::vector<uint8_t> result;
 
@@ -266,7 +266,7 @@ namespace blockchain
         return result;
     }
 
-    uint32_t BigUnsigned::ToUInt32() const
+    uint32_t BigNumber::ToUInt32() const
     {
         if (data.size() > 2)
         {

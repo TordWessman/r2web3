@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #include "../Shared/Common.h"
-#include "../Shared/BigUnsigned.h"
+#include "../Shared/BigNumber.h"
 #include "Address.h"
 
 namespace blockchain
@@ -47,7 +47,7 @@ namespace blockchain
         EncodableItem(uint8_t value, const char *handle = "uint256") : type(EncodableItemType::UnsignedInt), bytes((uint32_t)value | byte_array::uint_to_bytes), handle(handle) {}
 
         /// @brief Encode any unsigned number.
-        EncodableItem(const BigUnsigned *value, const char *handle = "uint256") : type(EncodableItemType::UnsignedInt), bytes(value->Bytes() | byte_array::truncate), handle(handle) {}
+        EncodableItem(const BigNumber *value, const char *handle = "uint256") : type(EncodableItemType::UnsignedInt), bytes(value->Bytes() | byte_array::truncate), handle(handle) {}
 
         /// @brief Encode a string.
         EncodableItem(const char *value) : type(EncodableItemType::String), bytes(value | byte_array::string_to_bytes), handle("string") {}

@@ -117,18 +117,18 @@ namespace blockchain
         return Result<uint32_t>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
-    Result<BigUnsigned> Chain::GetBalance(const Address &address, const Address &contractAddress) const
+    Result<BigNumber> Chain::GetBalance(const Address &address, const Address &contractAddress) const
     {
         ContractCall getBalanceCall("balanceOf", {ENC(&address)});
         Result<TransactionResponse> response = ViewCall(&getBalanceCall, address, contractAddress);
         if (response.HasValue())
         {
-            return Result<BigUnsigned>(response.Value().Result());
+            return Result<BigNumber>(response.Value().Result());
         }
-        return Result<BigUnsigned>::Err(response.ErrorCode(), response.ErrorMessage());
+        return Result<BigNumber>::Err(response.ErrorCode(), response.ErrorMessage());
     }
 
-    Result<BigUnsigned> Chain::GetTransactionCount(const Account *account) const
+    Result<BigNumber> Chain::GetTransactionCount(const Account *account) const
     {
         AssertStarted();
         cJSON *params = cJSON_CreateArray();
@@ -144,12 +144,12 @@ namespace blockchain
 
         if (result.HasValue())
         {
-            BigUnsigned count(result.Value());
+            BigNumber count(result.Value());
             free(result.Value());
             return count;
         }
 
-        return Result<BigUnsigned>::Err(result.ErrorCode());
+        return Result<BigNumber>::Err(result.ErrorCode());
     }
 
     Result<TransactionResponse> Chain::ViewCall(const ContractCall *contractCall, const Address &callerAddress, const Address &contractAddress) const
@@ -181,11 +181,11 @@ namespace blockchain
     }
 
     Result<TransactionResponse> Chain::Send(const Account *from, const Address &to,
-                                            const BigUnsigned &amount, const BigUnsigned &gasPrice,
+                                            const BigNumber &amount, const BigNumber &gasPrice,
                                             const uint32_t gasLimit, const ContractCall *contractCall) const
     {
         AssertStarted();
-        Result<BigUnsigned> nonceResult = GetTransactionCount(from);
+        Result<BigNumber> nonceResult = GetTransactionCount(from);
         
         if (!nonceResult.HasValue())
         {
@@ -220,7 +220,7 @@ namespace blockchain
         return Result<TransactionResponse>::Err(result.ErrorCode());
     }
 
-    Result<BigUnsigned> Chain::GetGasPrice() const  {
+    Result<BigNumber> Chain::GetGasPrice() const  {
         AssertStarted();
         cJSON *params = cJSON_CreateArray();
 
@@ -232,15 +232,15 @@ namespace blockchain
 
         if (result.HasValue())
         {
-            BigUnsigned count(result.Value());
+            BigNumber count(result.Value());
             free(result.Value());
             return count;
         }
 
-        return Result<BigUnsigned>::Err(result.ErrorCode());
+        return Result<BigNumber>::Err(result.ErrorCode());
     }
 
-    Result<BigUnsigned> Chain::GetBalance(const Address &address) const {
+    Result<BigNumber> Chain::GetBalance(const Address &address) const {
         AssertStarted();
         cJSON *params = cJSON_CreateArray();
 
@@ -255,12 +255,12 @@ namespace blockchain
 
         if (result.HasValue())
         {
-            BigUnsigned count(result.Value());
+            BigNumber count(result.Value());
             free(result.Value());
             return count;
         }
 
-        return Result<BigUnsigned>::Err(result.ErrorCode());
+        return Result<BigNumber>::Err(result.ErrorCode());
     }
 
     void Chain::AssertStarted() const {

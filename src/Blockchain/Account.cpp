@@ -4,7 +4,7 @@
 #include "../cryptography/secp256k1.h"
 #include "../cryptography/ecdsa.h"
 
-#include "../Shared/BigUnsigned.h"
+#include "../Shared/BigNumber.h"
 
 namespace blockchain
 {

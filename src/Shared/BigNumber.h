@@ -7,32 +7,36 @@
 
 namespace blockchain
 {
-    /// @brief Represents a "large" unsigned number.
-    class BigUnsigned
+    /// @brief Represents a "large" real number.
+    class BigNumber
     {
+        enum Sign {
+            Positive,
+            Negative
+        };
 
     public:
         /// @brief Represents '0'
-        BigUnsigned();
+        BigNumber();
 
         /// @brief Constructor using a hexadecimal string.
         /// @param value A hex-string with - or without the "0x" prefix.
-        BigUnsigned(const char *hexString);
+        BigNumber(const char *hexString);
 
         /// @brief Constructor using an unsigned 32-bit value.
         /// @param value
-        BigUnsigned(uint32_t value);
+        BigNumber(uint32_t value);
 
         /// @brief Construct using an array of 16-bit values.
         /// @param value
-        BigUnsigned(const std::vector<uint16_t> value);
+        BigNumber(const std::vector<uint16_t> value);
 
         /// @brief A floating point representation of a value, which will transform it to it's gwei-representation
         /// @param toGwei The value in whole units.
         /// @param decimals The number of decimals to use.
-        BigUnsigned(float toGwei, uint8_t decimals);
+        BigNumber(float toGwei, uint8_t decimals);
 
-        BigUnsigned(const BigUnsigned &other)
+        BigNumber(const BigNumber &other)
         {
             if (other.hexString != nullptr)
             {
@@ -42,7 +46,7 @@ namespace blockchain
             data = other.data;
         }
 
-        BigUnsigned &operator=(const BigUnsigned &other)
+        BigNumber &operator=(const BigNumber &other)
         {
             if (this != &other)
             {
@@ -57,7 +61,7 @@ namespace blockchain
             return *this;
         }
 
-        ~BigUnsigned()
+        ~BigNumber()
         {
             if (hexString != nullptr)
             {
@@ -82,7 +86,10 @@ namespace blockchain
         /// @return
         char *GenerateDecimalString() const;
 
-        BigUnsigned *clone() const { return new BigUnsigned(*this); }
+        BigNumber *clone() const { return new BigNumber(*this); }
+
+        /// @brief Śign of the number. Currently, only positive numbers are supported.
+        const Sign Sign = Sign::Positive;
 
     private:
         std::vector<uint16_t> data;

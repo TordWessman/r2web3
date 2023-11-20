@@ -3,7 +3,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include "../Shared/BigUnsigned.h"
+#include "../Shared/BigNumber.h"
 #include "../Shared/Common.h"
 #include "Transaction.h"
 #include "Encodable.h"
@@ -46,8 +46,8 @@ namespace blockchain
     /// @brief Represents the properties required for a transaction for Ethereum compatible chains.
     struct EthereumTransactionProperties
     {
-        EthereumTransactionProperties(uint32_t nonce, BigUnsigned gasPrice, uint32_t gasLimit,
-                                    Address address, BigUnsigned value, std::vector<uint8_t> data,
+        EthereumTransactionProperties(uint32_t nonce, BigNumber gasPrice, uint32_t gasLimit,
+                                    Address address, BigNumber value, std::vector<uint8_t> data,
                                     uint32_t chainId) : nonce(nonce), gasPrice(gasPrice), gasLimit(gasLimit),
                                                         address(address), value(value), data(data),
                                                         chainId(chainId), signingStandard(EthereumSigningStandard::Legacy)
@@ -57,10 +57,10 @@ namespace blockchain
 
         const EthereumSigningStandard signingStandard;
         const uint32_t nonce;
-        const BigUnsigned gasPrice;
+        const BigNumber gasPrice;
         const uint32_t gasLimit;
         const Address address;
-        const BigUnsigned value;
+        const BigNumber value;
         std::vector<uint8_t> data;
         const uint32_t chainId;
     };

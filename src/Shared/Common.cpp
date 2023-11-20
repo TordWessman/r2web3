@@ -3,7 +3,7 @@
 #include <cctype>
 #include <cassert>
 #include "../configuration.h"
-#include "BigUnsigned.h"
+#include "BigNumber.h"
 
 #ifdef ARDUINO
 #include <Arduino.h>
