@@ -87,6 +87,18 @@ namespace blockchain
         /// @return 
         Result<uint32_t> GetChainId() const;
 
+        /// @brief Returns the estimated gas price for a transaction
+        /// @param from
+        /// @param to
+        /// @param amount
+        /// @param gasPrice
+        /// @param gasLimit
+        /// @param contractCall a `ContractCall` object for an RPC invocation or `nullptr` for a transaction. 
+        /// @return
+        Result<BigNumber> EstimateGas(const Account *from, const Address &to,
+                                      const BigNumber &amount, const BigNumber &gasPrice,
+                                      const uint32_t gasLimit, const ContractCall *contractCall) const;
+
         /// @brief Return the current gas price.
         /// @return 
         Result<BigNumber> GetGasPrice() const;

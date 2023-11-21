@@ -220,6 +220,46 @@ namespace blockchain
         return Result<TransactionResponse>::Err(result.ErrorCode());
     }
 
+    Result<BigNumber> Chain::EstimateGas(const Account *from, const Address &to,
+                                       const BigNumber &amount, const BigNumber &gasPrice,
+                                       const uint32_t gasLimit, const ContractCall *contractCall) const
+    {
+        AssertStarted();
+        Result<BigNumber> nonceResult = GetTransactionCount(from);
+
+        if (!nonceResult.HasValue())
+        {
+            return Result<BigNumber>::Err(-1, "Unable to retrieve nonce.");
+        }
+
+        uint32_t nonce = nonceResult.Value().ToUInt32();
+
+        EthereumTransactionProperties p(nonce, gasPrice, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
+
+        std::vector<uint8_t> pk = from->GetPrivateKey();
+
+        EthereumTransaction tx = transactionFactory->GenerateTransaction(p, &pk);
+
+        std::vector<uint8_t> serializedTransaction = tx.Serialize();
+
+        cJSON *params = cJSON_CreateArray();
+        char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
+        cJSON_AddItemToArray(params, cJSON_CreateString(parameter));
+        delete[] parameter;
+
+        char *request_body = BaseJsonBody("eth_estimateGas", params);
+
+        Result<char *> result = DoRequestYo(network, url, request_body);
+
+        cJSON_free(request_body);
+
+        if (result.HasValue())
+        {
+            return Result<BigNumber>(result.Value());
+        }
+        return Result<BigNumber>::Err(result.ErrorCode());
+    }
+
     Result<BigNumber> Chain::GetGasPrice() const  {
         AssertStarted();
         cJSON *params = cJSON_CreateArray();
