@@ -1,26 +1,3 @@
-# r2web3
-A Web3 library intended to be used for microcontrollers. Has at this point only been tested on ESP8266 and ESP32 boards.
-
-This project is incomplete, but might serve some purposes. Here's a list of a few thing that's on the initial roadmap:
- * Parse errors
- * Clean up `Chain`
- * Unit tests
- * ABI encoding (existing, but incomplete)
- * ABI decoding
- * Various JSON-RPC implementations (e g gas estimation, receipt retrieval etc)
- * EIP-155 support
-
-## Installation
-```
-$ cd ~/Arduino/libraries
-$ git clone https://github.com/TordWessman/r2web3.git
-```
-Remember to restart Arduino IDE
-
-## Examples
-Here's a blob of example code.
-
-```
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
 #endif
@@ -36,9 +13,7 @@ using namespace blockchain;
 #define PRIVATE_KEY "<private key>" // Account private key
 #define CONTRACT_ADDRESS "<contract address>" // Address to a deployed contract
 
-// Use CA Certificate for https.
-// The one below is valid for json-rpc.evm.testnet.shimmer.network.
-// Use root certificate unless accessing a local endpoint (e.g. Ganache).
+// Use root certificate unless accessing a local endpoint (e.g. Ganache)
 const char cert [] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
 MIIDzTCCArWgAwIBAgIQCjeHZF5ftIwiTv0b7RQMPDANBgkqhkiG9w0BAQsFADBa
@@ -89,6 +64,7 @@ void setup() {
   } else {
     Serial.println("...failed");
   }
+
 }
 
 /// Example of a transfer to a specific address
@@ -146,14 +122,3 @@ void loop() {
     getBalance();
     delay(1000 * 60 * 60);
 }
-```
-
-## Secure connection (HTTPS)
-When accessing a HTTP over TLS, one must specify the root certificate for the endpoint when instantiating the `ESPNetwork`.
-
-Please note that `Restart()` method must be called once the WiFi connection has been established _if_ the device clock has lost synchronization (e g after suspension).
-
-There are several ways to retrieve the certificate, and here's one:
-```
-$ openssl s_client -showcerts -verify 5 -connect <endpoint>:443 < /dev/null
-```
