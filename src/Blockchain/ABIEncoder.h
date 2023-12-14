@@ -1,5 +1,5 @@
-#ifndef __ABI_ARGUMENT_ENCODER_H__
-#define __ABI_ARGUMENT_ENCODER_H__
+#ifndef __ABI_ENCODER_H__
+#define __ABI_ENCODER_H__
 
 #include <vector>
 #include <stdint.h>
