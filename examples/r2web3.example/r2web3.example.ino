@@ -13,6 +13,8 @@ using namespace blockchain;
 #define PRIVATE_KEY "<private key>" // Account private key
 #define CONTRACT_ADDRESS "<contract address>" // Address to a deployed contract
 
+// Use CA Certificate for https.
+// The one below is valid for json-rpc.evm.testnet.shimmer.network.
 // Use root certificate unless accessing a local endpoint (e.g. Ganache)
 const char cert [] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
@@ -43,7 +45,7 @@ CZMRJCQUzym+5iPDuI9yP+kHyCREU3qzuWFloUwOxkgAyXVjBYdwRVKD05WdRerw
 Account account(PRIVATE_KEY);
 Address contractAddress(CONTRACT_ADDRESS);
 ESPNetwork networkFacade(cert); // Use the ESP network stack.
-Chain chain("https://json-rpc.evm.testnet.shimmer.network", &networkFacade); // Use ShimmerEVM testnet
+Chain chain("https://json-rpc.evm.testnet.shimmer.network", &networkFacade); // Use ShimmerEVM testnet.
 
 void setup() {
 
@@ -64,7 +66,6 @@ void setup() {
   } else {
     Serial.println("...failed");
   }
-
 }
 
 /// Example of a transfer to a specific address
