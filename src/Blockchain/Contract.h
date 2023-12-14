@@ -1,7 +1,7 @@
 #ifndef __CONTRACT_H__
 #define __CONTRACT_H__
 
-#include "ABIArgumentEncoder.h"
+#include "ABIEncoder.h"
 #include <vector>
 #include <stdint.h>
 
@@ -31,7 +31,7 @@ namespace blockchain
         const std::vector<EncodableItem> arguments;
         std::vector<uint8_t> signatureHash;
         void GenerateSignatureHash();
-        ABIArgumentEncoder encoder;
+        ABIEncoder encoder;
     };
 
     // class Contract

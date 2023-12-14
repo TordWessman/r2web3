@@ -205,6 +205,7 @@ namespace blockchain
         cJSON *params = cJSON_CreateArray();
         char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
         cJSON_AddItemToArray(params, cJSON_CreateString(parameter));
+        Log::m("Transaciton data: ", parameter);
         delete[] parameter;
 
         char *request_body = BaseJsonBody("eth_sendRawTransaction", params);
