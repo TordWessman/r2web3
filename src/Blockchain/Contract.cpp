@@ -5,7 +5,7 @@
 
 namespace blockchain
 {
-    #define PARAMETER_POINTER_SIZE 32
+    #define ARGUMENT_LENGTH 32
 
     void ContractCall::GenerateSignatureHash()
     {
@@ -52,7 +52,7 @@ namespace blockchain
         signatureHash.insert(signatureHash.begin(), hash.begin(), hash.end());
     }
 
-    void padx(std::vector<uint8_t> *argument, const std::vector<uint8_t> &value, const bool left = true, const size_t argumentLength = PARAMETER_POINTER_SIZE)
+    void padx(std::vector<uint8_t> *argument, const std::vector<uint8_t> &value, const bool left = true, const size_t argumentLength = ARGUMENT_LENGTH)
     {
         assert(value.size() <= argumentLength);
         size_t start = argumentLength - value.size();
@@ -63,12 +63,11 @@ namespace blockchain
         }
     }
 
-    bool isPointer(const EncodableItem *argument)
+    bool isDynamic(const EncodableItem *argument)
     {
         return argument->Type() == EncodableItemType::ItemArray ||
-            argument->Type() == EncodableItemType::Binary ||
-            argument->Type() == EncodableItemType::String;
-
+               argument->Type() == EncodableItemType::Binary ||
+               argument->Type() == EncodableItemType::String;
     }
 
     std::vector<uint8_t> ContractCall::AsData() const {
@@ -79,9 +78,9 @@ namespace blockchain
         for(size_t i = 0; i < arguments.size(); i++)
         {
             params.push_back(encoder.Encode(&arguments[i]));
-            if (isPointer(&arguments[i]))
+            if (isDynamic(&arguments[i]))
             {
-                dataPosition += PARAMETER_POINTER_SIZE;
+                dataPosition += ARGUMENT_LENGTH;
             }
             else
             {
@@ -93,13 +92,14 @@ namespace blockchain
         
         for (size_t i = 0; i < arguments.size(); i++)
         {
-            if (isPointer(&arguments[i]))
+            if (isDynamic(&arguments[i]))
             {
-                std::vector<uint8_t> positionVector(PARAMETER_POINTER_SIZE, 0);    
+                std::vector<uint8_t> positionVector(ARGUMENT_LENGTH, 0);
                 padx(&positionVector, dataPosition | byte_array::size_to_bytes);
                 callData.insert(callData.end(), positionVector.begin(), positionVector.end());
                 dataPosition += params[i].size();
-            } else
+            } 
+            else
             {
                 callData.insert(callData.end(), params[i].begin(), params[i].end());
             }
@@ -107,12 +107,12 @@ namespace blockchain
 
         for (size_t i = 0; i < arguments.size(); i++)
         {
-            if (isPointer(&arguments[i]))
+            if (isDynamic(&arguments[i]))
             {
                 callData.insert(callData.end(), params[i].begin(), params[i].end());
             }
         }
 
-    return callData;
+        return callData;
     }
 }

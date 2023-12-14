@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "ABIArgumentEncoder.h"
+#include "ABIEncoder.h"
 #include "../Shared/Common.h"
 
 namespace blockchain
@@ -36,12 +36,7 @@ namespace blockchain
         {
             return ARGUMENT_LENGTH + item->Children().size() * ARGUMENT_LENGTH;
         }
-        else if (item->Type() == EncodableItemType::String)
-        {
-            // Will probably not be correct. 
-            return ARGUMENT_LENGTH;// + item->Bytes().size();
-        }
-        else if (item->Type() == EncodableItemType::Binary)
+        else if (item->Type() == EncodableItemType::Binary || item->Type() == EncodableItemType::String)
         {
             return ARGUMENT_LENGTH + (item->Bytes().size() / ARGUMENT_LENGTH + 1) * ARGUMENT_LENGTH;
         }
@@ -57,11 +52,7 @@ namespace blockchain
         {
             pad(&encoded, item->Bytes());
         } 
-        else if (rightPad(item->Type()))
-        {
-            pad(&encoded, item->Bytes(), false);
-        }
-        else if (item->Type() == EncodableItemType::Binary)
+        else if (item->Type() == EncodableItemType::Binary || item->Type() == EncodableItemType::String)
         {
             pad(&encoded, item->Bytes().size() | byte_array::size_to_bytes);
             for(size_t i = 0; i < item->Bytes().size(); i++)
