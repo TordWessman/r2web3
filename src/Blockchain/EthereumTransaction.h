@@ -47,8 +47,8 @@ namespace blockchain
     struct EthereumTransactionProperties
     {
         EthereumTransactionProperties(uint32_t nonce, BigNumber gasPrice, uint32_t gasLimit,
-                                    Address address, BigNumber value, std::vector<uint8_t> data,
-                                    uint32_t chainId) : nonce(nonce), gasPrice(gasPrice), gasLimit(gasLimit),
+                                      Address address, BigNumber value, std::vector<uint8_t> data,
+                                      uint32_t chainId) : nonce(nonce), gasPrice(gasPrice), gasLimit(gasLimit),
                                                         address(address), value(value), data(data),
                                                         chainId(chainId), signingStandard(EthereumSigningStandard::Legacy)
         {

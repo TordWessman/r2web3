@@ -129,14 +129,14 @@ namespace blockchain
         /// @brief Send a signed transaction. This could either be a transfer or a contract call.
         /// @param from Sender account
         /// @param to Receiving address
-        /// @param amount Amount (gwei) to transfer. If this is a contract call, `amount` should be zero. 
-        /// @param gasPrice Gas price
+        /// @param amount Amount (gwei) to transfer. If this is a contract call, `amount` should be zero.
         /// @param gasLimit Gas limit
+        /// @param gasPrice Optional parameter. Gas price. If not specified, `GetGasPrice()` will be used.
         /// @param contractCall Optional parameter. If provided, this `Send` invocation is considered to be a contract execution.
         /// @return The result of the transaction.
         Result<TransactionResponse> Send(const Account *from, const Address &to,
-                                        const BigNumber &amount, const BigNumber &gasPrice,
-                                        const uint32_t gasLimit, const ContractCall *contractCall = nullptr) const;
+                                        const BigNumber &amount, const uint32_t gasLimit,
+                                        const BigNumber *gasPrice = nullptr, const ContractCall *contractCall = nullptr) const;
         
 
     private:

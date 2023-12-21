@@ -71,10 +71,9 @@ void setup() {
 /// Example of a transfer to a specific address
 void makeTransfer() {
   Address sendToAddress("<recipient address>");
-  BigNumber gasPrice = chain.GetGasPrice().Value();
   BigNumber sendAmount = BigNumber(random(1000,10000));
   uint32_t gasLimit = 6721975;
-  chain.Send(&account, sendToAddress, sendAmount, gasPrice, gasLimit);
+  chain.Send(&account, sendToAddress, sendAmount, gasLimit);
 }
 
 /// Check balance
@@ -113,13 +112,13 @@ void mutateCall() {
     BigNumber gasPrice(1234567); // chain.EstimateGas could be used instead.
     BigNumber sendAmount = BigNumber(0u);
     uint32_t gasLimit = 6721975;
-    Result<TransactionResponse> contractCallResponse = chain.Send(&account, contractAddress, sendAmount, gasPrice, 6721975, &contractCall);
+    Result<TransactionResponse> contractCallResponse = chain.Send(&account, contractAddress, sendAmount, 6721975, &gasPrice, &contractCall);
 }
 
 void loop() {
-    //makeTransfer();
-    //viewCall();
-    //mutateCall();
+    makeTransfer();
+    viewCall();
+    mutateCall();
     getBalance();
     delay(1000 * 60 * 60);
 }

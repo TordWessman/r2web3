@@ -187,6 +187,19 @@ namespace blockchain
 
     BigNumber::BigNumber(float toGwei, uint8_t decimals = 18)
     {
+        THROW("Not implemented yet.");
+        GenerateHexString();
+    }
+
+    BigNumber::BigNumber(const BigNumber *other)
+    {
+        if (other != nullptr)
+        {
+            for (uint16_t part: other->data) 
+            {
+                data.push_back(part);
+            }
+        }
         GenerateHexString();
     }
 

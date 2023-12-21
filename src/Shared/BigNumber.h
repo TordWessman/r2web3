@@ -36,6 +36,10 @@ namespace blockchain
         /// @param decimals The number of decimals to use.
         BigNumber(float toGwei, uint8_t decimals);
 
+        /// @brief Copy reference.
+        /// @param other 
+        BigNumber(const BigNumber *other);
+
         BigNumber(const BigNumber &other)
         {
             if (other.hexString != nullptr)

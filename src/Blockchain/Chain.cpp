@@ -12,7 +12,7 @@ namespace blockchain
             if (chainIdResult.HasValue()) { id = chainIdResult.Value(); } 
             else 
             {
-                Log::e("Unable to fetch chainId");
+                Log::e("Unable to fetch chainId: ", chainIdResult.ErrorMessage());
                 return false;
             }
         }
@@ -181,8 +181,8 @@ namespace blockchain
     }
 
     Result<TransactionResponse> Chain::Send(const Account *from, const Address &to,
-                                            const BigNumber &amount, const BigNumber &gasPrice,
-                                            const uint32_t gasLimit, const ContractCall *contractCall) const
+                                            const BigNumber &amount, const uint32_t gasLimit,
+                                            const BigNumber *gasPrice, const ContractCall *contractCall) const
     {
         AssertStarted();
         Result<BigNumber> nonceResult = GetTransactionCount(from);
@@ -193,8 +193,21 @@ namespace blockchain
         }
 
         uint32_t nonce = nonceResult.Value().ToUInt32();
+
+
+        BigNumber gp(gasPrice);
+
+        if (gasPrice == nullptr)
+        {
+            Result<BigNumber> gasPriceResult = GetGasPrice();
+            if (!gasPriceResult.HasValue())
+            {
+                return Result<TransactionResponse>::Err(-41, "Unable to fetch gas price.");
+            }
+            gp = gasPriceResult.Value();
+        }
         
-        EthereumTransactionProperties p(nonce, gasPrice, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
+        EthereumTransactionProperties p(nonce, &gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
 
         std::vector<uint8_t> pk = from->GetPrivateKey();
         
