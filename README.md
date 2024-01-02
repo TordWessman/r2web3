@@ -1,7 +1,7 @@
 # r2web3
 A Web3 library intended to be used for microcontrollers. Has at this point only been tested on ESP8266 and ESP32 boards.
 
-This project is incomplete, but might serve some purposes. Here's a list of a few thing that's on the initial roadmap:
+This project is under development. Here's a list of a few thing that's on the initial roadmap:
  * Parse errors
  * Clean up `Chain`
  * Unit tests
@@ -38,7 +38,7 @@ using namespace blockchain;
 
 // Use CA Certificate for https.
 // The one below is valid for json-rpc.evm.testnet.shimmer.network.
-// Use root certificate unless accessing a local endpoint (e.g. Ganache).
+// Use root certificate unless accessing a local endpoint (e.g. Ganache)
 const char cert [] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
 MIIDzTCCArWgAwIBAgIQCjeHZF5ftIwiTv0b7RQMPDANBgkqhkiG9w0BAQsFADBa
@@ -68,7 +68,7 @@ CZMRJCQUzym+5iPDuI9yP+kHyCREU3qzuWFloUwOxkgAyXVjBYdwRVKD05WdRerw
 Account account(PRIVATE_KEY);
 Address contractAddress(CONTRACT_ADDRESS);
 ESPNetwork networkFacade(cert); // Use the ESP network stack.
-Chain chain("https://json-rpc.evm.testnet.shimmer.network", &networkFacade); // Use ShimmerEVM testnet
+Chain chain("https://json-rpc.evm.testnet.shimmer.network", &networkFacade); // Use ShimmerEVM testnet.
 
 void setup() {
 
@@ -94,10 +94,9 @@ void setup() {
 /// Example of a transfer to a specific address
 void makeTransfer() {
   Address sendToAddress("<recipient address>");
-  BigNumber gasPrice = chain.GetGasPrice().Value();
   BigNumber sendAmount = BigNumber(random(1000,10000));
   uint32_t gasLimit = 6721975;
-  chain.Send(&account, sendToAddress, sendAmount, gasPrice, gasLimit);
+  chain.Send(&account, sendToAddress, sendAmount, gasLimit);
 }
 
 /// Check balance
@@ -119,7 +118,7 @@ void getBalance() {
 
 /// View call
 void viewCall() {
-  ContractCall call("add", {ENC(10u, "uint32"), ENC({ENC(20u), ENC(30u)}, "uint32[]")}); //Equivalent to method signature 'add(uint32,uint32[])'
+  ContractCall call("add", {ENC(10u, "uint32"), ENC({ENC(20u), ENC(30u)}, "uint32[]")}); // Equivalent to method signature 'add(uint32,uint32[])'
   
   Result<TransactionResponse> result = chain.ViewCall(&call, account.GetAddress(), contractAddress);
   
@@ -130,19 +129,19 @@ void viewCall() {
   }
 }
 
-/// (Mutating) contract call
+/// (State changing) contract call
 void mutateCall() {
-    ContractCall contractCall("setFoo", {ENC((uint32_t)random(1000,10000))}); //Equivalent to method signature 'setFoo(uint256y)'
+    ContractCall contractCall("setFoo", {ENC((uint32_t)random(1000,10000))}); // Equivalent to method signature 'setFoo(uint256)'
     BigNumber gasPrice(1234567); // chain.EstimateGas could be used instead.
     BigNumber sendAmount = BigNumber(0u);
     uint32_t gasLimit = 6721975;
-    Result<TransactionResponse> contractCallResponse = chain.Send(&account, contractAddress, sendAmount, gasPrice, 6721975, &contractCall);
+    Result<TransactionResponse> contractCallResponse = chain.Send(&account, contractAddress, sendAmount, 6721975, &gasPrice, &contractCall);
 }
 
 void loop() {
-    //makeTransfer();
-    //viewCall();
-    //mutateCall();
+    makeTransfer();
+    viewCall();
+    mutateCall();
     getBalance();
     delay(1000 * 60 * 60);
 }
@@ -151,7 +150,7 @@ void loop() {
 ## Secure connection (HTTPS)
 When accessing a HTTP over TLS, one must specify the root certificate for the endpoint when instantiating the `ESPNetwork`.
 
-Please note that `Restart()` method must be called once the WiFi connection has been established _if_ the device clock has lost synchronization (e g after suspension).
+Please note that `Restart()` method must be called once the WiFi connection has been established and _if_ the device clock has lost synchronization (e g after hybernation).
 
 There are several ways to retrieve the certificate, and here's one:
 ```

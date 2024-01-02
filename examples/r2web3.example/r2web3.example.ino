@@ -95,7 +95,7 @@ void getBalance() {
 
 /// View call
 void viewCall() {
-  ContractCall call("add", {ENC(10u, "uint32"), ENC({ENC(20u), ENC(30u)}, "uint32[]")}); //Equivalent to method signature 'add(uint32,uint32[])'
+  ContractCall call("add", {ENC(10u, "uint32"), ENC({ENC(20u), ENC(30u)}, "uint32[]")}); // Equivalent to method signature 'add(uint32,uint32[])'
   
   Result<TransactionResponse> result = chain.ViewCall(&call, account.GetAddress(), contractAddress);
   
@@ -106,9 +106,9 @@ void viewCall() {
   }
 }
 
-/// (Mutating) contract call
+/// (State changing) contract call
 void mutateCall() {
-    ContractCall contractCall("setFoo", {ENC((uint32_t)random(1000,10000))}); //Equivalent to method signature 'setFoo(uint256y)'
+    ContractCall contractCall("setFoo", {ENC((uint32_t)random(1000,10000))}); // Equivalent to method signature 'setFoo(uint256y)'
     BigNumber gasPrice(1234567); // chain.EstimateGas could be used instead.
     BigNumber sendAmount = BigNumber(0u);
     uint32_t gasLimit = 6721975;
