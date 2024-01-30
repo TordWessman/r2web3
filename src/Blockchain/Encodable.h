@@ -60,6 +60,9 @@ namespace blockchain
 
         /// @brief Encode as address
         EncodableItem(const Address *value) : type(EncodableItemType::Address), bytes(value->AsString() | byte_array::hex_string_to_bytes), handle("address") {}
+        
+        /// @brief Encode as address
+        EncodableItem(const Address value) : type(EncodableItemType::Address), bytes(value.AsString() | byte_array::hex_string_to_bytes), handle("address") {}
 
         /// @brief Encode as a 32-bit unsigned integer. `handle` defaults to "uint256".
         EncodableItem(uint32_t value, const char *handle = "uint256") : type(EncodableItemType::UnsignedInt), bytes(value | byte_array::uint_to_bytes), handle(handle) {}

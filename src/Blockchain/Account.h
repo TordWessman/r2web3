@@ -44,7 +44,7 @@ namespace blockchain
         /// @param pk private key.
         Account(const char *pk) : privateKey(pk | byte_array::hex_string_to_bytes), address(Account::GenerateAddress(&privateKey)) {}
 
-        static Address GenerateAddress(std::vector<uint8_t> *privateKey) 
+        static Address GenerateAddress(const std::vector<uint8_t> *privateKey) 
         {
             std::vector<uint8_t> publicKey = CalculatePublicKey(privateKey);
             char *hexString = (CalculateAddress(&publicKey) | byte_array::hex_string);
@@ -70,8 +70,8 @@ namespace blockchain
         static std::vector<uint8_t> CalculatePublicKey(const std::vector<uint8_t> *privateKey, size_t publicKeySize = ETH_PUBLIC_KEY_SIZE);
 
     private:
-        std::vector<uint8_t> privateKey;
-        Address address;
+        const std::vector<uint8_t> privateKey;
+        const Address address;
     };
 }
 #endif

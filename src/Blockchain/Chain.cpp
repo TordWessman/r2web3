@@ -169,7 +169,7 @@ namespace blockchain
         return Result<uint32_t>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
-    Result<BigNumber> Chain::GetBalance(const Address *address, const Address *contractAddress) const
+    Result<BigNumber> Chain::GetBalance(const Address address, const Address contractAddress) const
     {
         ContractCall getBalanceCall("balanceOf", {ENC(address)});
         Result<TransactionResponse> response = ViewCall(address, contractAddress, &getBalanceCall);
@@ -180,12 +180,12 @@ namespace blockchain
         return Result<BigNumber>::Err(response.ErrorCode(), response.ErrorMessage());
     }
 
-    Result<BigNumber> Chain::GetTransactionCount(const Address *address) const
+    Result<BigNumber> Chain::GetTransactionCount(const Address address) const
     {
         AssertStarted();
         cJSON *params = cJSON_CreateArray();
 
-        cJSON_AddItemToArray(params, cJSON_CreateString(address->AsString()));
+        cJSON_AddItemToArray(params, cJSON_CreateString(address.AsString()));
         cJSON_AddItemToArray(params, cJSON_CreateString("latest"));
 
         char *request_body = BaseJsonBody("eth_getTransactionCount", params);
@@ -232,14 +232,14 @@ namespace blockchain
         return Result<TransactionReceipt*>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
-    Result<TransactionResponse> Chain::ViewCall(const Address *callerAddress, const Address *contractAddress, const ContractCall *contractCall) const
+    Result<TransactionResponse> Chain::ViewCall(const Address callerAddress, const Address contractAddress, const ContractCall *contractCall) const
     {
         AssertStarted();
         cJSON *callCJson = cJSON_CreateObject();
         cJSON *params = cJSON_CreateArray();
 
-        cJSON_AddStringToObject(callCJson, "from", callerAddress->AsString());
-        cJSON_AddStringToObject(callCJson, "to", contractAddress->AsString());
+        cJSON_AddStringToObject(callCJson, "from", callerAddress.AsString());
+        cJSON_AddStringToObject(callCJson, "to", contractAddress.AsString());
         char *dataAsHexString = (contractCall->AsData() | byte_array::hex_string) | char_string::add_hex_prefix;
 
         cJSON_AddStringToObject(callCJson, "data", dataAsHexString);
@@ -259,13 +259,12 @@ namespace blockchain
         return Result<TransactionResponse>::Err(result.ErrorCode());
     }
 
-    Result<TransactionResponse> Chain::Send(const Account *from, const Address *to,
-                                            const BigNumber *amount, const uint32_t gasLimit,
+    Result<TransactionResponse> Chain::Send(const Account *from, const Address to,
+                                            const BigNumber amount, const uint32_t gasLimit,
                                             const BigNumber *gasPrice, const ContractCall *contractCall) const
     {
         AssertStarted();
-        Address fromAddress = from->GetAddress();
-        Result<BigNumber> nonceResult = GetTransactionCount(&fromAddress);
+        Result<BigNumber> nonceResult = GetTransactionCount(from->GetAddress());
 
         if (!nonceResult.HasValue())
         {
@@ -286,7 +285,7 @@ namespace blockchain
             gp = gasPriceResult.Value();
         }
 
-        EthereumTransactionProperties p(nonce, &gp, gasLimit, *to, *amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
+        EthereumTransactionProperties p(nonce, gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
 
         std::vector<uint8_t> pk = from->GetPrivateKey();
 
@@ -313,13 +312,12 @@ namespace blockchain
         return Result<TransactionResponse>::Err(result.ErrorCode());
     }
 
-    Result<BigNumber> Chain::EstimateGas(const Account *from, const Address *to,
-                                         const BigNumber *amount, const BigNumber *gasPrice,
-                                         const uint32_t gasLimit, const ContractCall *contractCall) const
+    Result<BigNumber> Chain::EstimateGas(const Account *from, const Address to,
+                                         const BigNumber amount, const uint32_t gasLimit,
+                                         const BigNumber *gasPrice, const ContractCall *contractCall) const
     {
         AssertStarted();
-        Address fromAddress = from->GetAddress();
-        Result<BigNumber> nonceResult = GetTransactionCount(&fromAddress);
+        Result<BigNumber> nonceResult = GetTransactionCount(from->GetAddress());
 
         if (!nonceResult.HasValue())
         {
@@ -328,7 +326,19 @@ namespace blockchain
 
         uint32_t nonce = nonceResult.Value().ToUInt32();
 
-        EthereumTransactionProperties p(nonce, gasPrice, gasLimit, *to, *amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
+        BigNumber gp(gasPrice);
+
+        if (gasPrice == nullptr)
+        {
+            Result<BigNumber> gasPriceResult = GetGasPrice();
+            if (!gasPriceResult.HasValue())
+            {
+                return Result<BigNumber>::Err(-41, "Unable to fetch gas price.");
+            }
+            gp = gasPriceResult.Value();
+        }
+
+        EthereumTransactionProperties p(nonce, gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
 
         std::vector<uint8_t> pk = from->GetPrivateKey();
 
@@ -377,12 +387,12 @@ namespace blockchain
         return Result<BigNumber>::Err(result.ErrorCode());
     }
 
-    Result<BigNumber> Chain::GetBalance(const Address *address) const
+    Result<BigNumber> Chain::GetBalance(const Address address) const
     {
         AssertStarted();
         cJSON *params = cJSON_CreateArray();
 
-        cJSON_AddItemToArray(params, cJSON_CreateString(address->AsString()));
+        cJSON_AddItemToArray(params, cJSON_CreateString(address.AsString()));
         cJSON_AddItemToArray(params, cJSON_CreateString("latest"));
 
         char *request_body = BaseJsonBody("eth_getBalance", params);
