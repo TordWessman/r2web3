@@ -71,7 +71,6 @@ namespace blockchain
         /// @return
         T Value() const
         {
-
             if (!HasValue())
             {
                 THROW("Unable to get Value. Result<T> was an error and had no value.");
@@ -193,6 +192,10 @@ namespace blockchain
         {
             string_info operator()(const string_info &v);
         };
+        struct is_null_t
+        {
+            bool operator()(char *v);
+        };
 
         /// @brief __DEALLOCATES__ input and returns a new string with the "0x" prefix.
         /// Please note that the returned string needs to be deallocated manually.
@@ -202,10 +205,13 @@ namespace blockchain
         /// @brief returns a `string_info` struct which where the `length` and `begin` is adjusted
         /// to the trimmed string where the hex-prefix ("0x") is omitted (if present).
         const remove_hex_prefix_t remove_hex_prefix = {};
+        /// @brief Returns true if string is NULL or "null".
+        const is_null_t is_null = {};
 
         char *operator|(char *v, add_hex_prefix_t f);
         string_info operator|(const string_info &v, ltrim_t f);
         string_info operator|(const string_info &v, remove_hex_prefix_t f);
+        bool operator|(char *v, is_null_t f);
     }
 }
 #endif

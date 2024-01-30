@@ -217,9 +217,17 @@ namespace blockchain
             return string_info(trimmed);
         }
 
+        bool is_null_t::operator()(char *v)
+        {
+            if (v == NULL) { return true; }
+            if (strcmp(v, "null") == 0) { return true; }
+            return false;
+        }
+
         char* operator|(char *v, add_hex_prefix_t f) { return f(v); }
         string_info operator|(const string_info &v, ltrim_t f) { return f(v); }
         string_info operator|(const string_info &v, remove_hex_prefix_t f) { return f(v); }
+        bool operator|(char *v, is_null_t f) { return f(v); }
     }
 
 }
