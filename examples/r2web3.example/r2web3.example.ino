@@ -97,7 +97,7 @@ void getBalance() {
 void viewCall() {
   ContractCall call("add", {ENC(10u, "uint32"), ENC({ENC(20u), ENC(30u)}, "uint32[]")}); // Equivalent to method signature 'add(uint32,uint32[])'
   
-  Result<TransactionResponse> result = chain.ViewCall(&call, account.GetAddress(), contractAddress);
+  Result<TransactionResponse> result = chain.ViewCall(account.GetAddress(), contractAddress, &call);
   
   if (result.HasValue()) {
     Serial.print("Result: "); Serial.println(result.Value().Result());
