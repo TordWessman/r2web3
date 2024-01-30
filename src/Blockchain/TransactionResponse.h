@@ -121,5 +121,12 @@ namespace blockchain
         Address from;
         Address to;
     };
+
+    /// @brief Information about a mined block.
+    struct BlockInformation {
+
+        BlockInformation(cJSON *result) : timestamp(BigNumber(cJSON_GetObjectItemCaseSensitive(result, "timestamp")->valuestring).ToUInt32()) {}
+        uint32_t timestamp;
+    };
 }
 #endif

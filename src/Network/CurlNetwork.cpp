@@ -79,12 +79,11 @@ namespace blockchain
         }
 
         long httpCode = 0;
-        
         curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &httpCode);
         response = (char *)malloc(responseBuffer.length() + 1);
         memcpy(response, responseBuffer.c_str(), responseBuffer.length());
         response[responseBuffer.length()] = '\0';
-
+        
         return HttpResponse(httpCode, response);
     }
 

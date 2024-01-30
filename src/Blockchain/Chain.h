@@ -162,10 +162,15 @@ namespace blockchain
                                         const BigNumber amount, const uint32_t gasLimit,
                                         const BigNumber *gasPrice = nullptr, const ContractCall *contractCall = nullptr) const;
 
-        /// @brief Returns a transaction `TransactionReceipt` for the specified transaction or `null` if no transaction was found.
+        /// @brief Returns a transaction `TransactionReceipt` for the specified transaction or `nulltype` if no transaction was found.
         /// @param transactionHash
-        /// @return
+        /// @return `TransactionReceipt` or nullptr if no transaction was found.
         Result<TransactionReceipt*> GetTransactionReceipt(const char *transactionHash) const;
+
+        /// @brief Returns the `BlockInformation` of the block with the provided `blockHash` or `nulltype` if no block was found.
+        /// @param blockHash
+        /// @return `BlockInformation` or nullptr if no block was found.
+        Result<BlockInformation*> GetBlockInformation(const char *blockHash) const;
 
     private:
         const ETFactory *transactionFactory;

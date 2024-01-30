@@ -232,6 +232,35 @@ namespace blockchain
         return Result<TransactionReceipt*>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
+    Result<BlockInformation*> Chain::GetBlockInformation(const char *blockHash) const
+    {
+        AssertStarted();
+        cJSON *params = cJSON_CreateArray();
+        cJSON_AddItemToArray(params, cJSON_CreateString(blockHash));
+        cJSON_AddItemToArray(params, cJSON_CreateBool(false));
+        char *request_body = BaseJsonBody("eth_getBlockByHash", params);
+
+        Result<char *> result = DoRequestYo(network, url, request_body);
+
+        cJSON_free(request_body);
+
+        if (result.HasValue())
+        {
+            if (result.Value() == NULL)
+            {
+                return Result<BlockInformation *>(nullptr);
+            }
+            else
+            {
+                cJSON *json = cJSON_Parse(result.Value());
+                free(result.Value());
+                return Result<BlockInformation *>(new BlockInformation(json));
+            }
+        }
+
+        return Result<BlockInformation *>::Err(result.ErrorCode(), result.ErrorMessage());
+    }
+
     Result<TransactionResponse> Chain::ViewCall(const Address callerAddress, const Address contractAddress, const ContractCall *contractCall) const
     {
         AssertStarted();
