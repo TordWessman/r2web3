@@ -66,7 +66,10 @@ namespace blockchain
             address[ETH_ADDRESS_LENGTH] = '\0';
         }
 
+        // Return the (human readable) address.
         const char* AsString() const { return address; }
+
+        Address *clone() const { return new Address(*this); }
 
     private:
         
