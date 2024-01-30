@@ -27,8 +27,15 @@
 
 #include <cstring>
 
+#include "../Shared/cJSON.h"
+#include "../Shared/BigNumber.h"
+#include "Address.h"
+
 namespace blockchain
 {
+    
+    #define ETH_BLOCK_HASH_SIZE 64
+
     /// @brief Arbitrary response container for requests. Will contain the `"result"` value for an ethereum request.
     class TransactionResponse
     {
@@ -89,6 +96,30 @@ namespace blockchain
 
     private:
         char *result;
+    };
+
+    /// @brief Transaction information
+    struct TransactionReceipt
+    {
+        TransactionReceipt(cJSON *result) : blockNumber(cJSON_GetObjectItemCaseSensitive(result, "blockNumber")->valuestring),
+                                            cumulativeGasUsed(cJSON_GetObjectItemCaseSensitive(result, "cumulativeGasUsed")->valuestring),
+                                            effectiveGasPrice(cJSON_GetObjectItemCaseSensitive(result, "effectiveGasPrice")->valuestring),
+                                            gasUsed(cJSON_GetObjectItemCaseSensitive(result, "gasUsed")->valuestring),
+                                            from(cJSON_GetObjectItemCaseSensitive(result, "from")->valuestring),
+                                            to(cJSON_GetObjectItemCaseSensitive(result, "to")->valuestring)
+        {
+            char *bhash = cJSON_GetObjectItemCaseSensitive(result, "blockHash")->valuestring;
+            strncpy(blockHash, bhash, ETH_BLOCK_HASH_SIZE + 2);
+            blockHash[ETH_BLOCK_HASH_SIZE + 2] = '\0';
+        }
+
+        char blockHash[ETH_BLOCK_HASH_SIZE + 2 + 1]; //Fit the leading `0x` and the trailing null-termination character.
+        BigNumber blockNumber;
+        BigNumber cumulativeGasUsed;
+        BigNumber effectiveGasPrice;
+        BigNumber gasUsed;
+        Address from;
+        Address to;
     };
 }
 #endif
