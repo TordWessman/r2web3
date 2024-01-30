@@ -46,7 +46,7 @@ namespace blockchain
 
     private:
         CURL *curlHandle;
-        static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp);
+        static size_t WriteCallback(void *contents, size_t size, size_t nmemb, std::string *output);
     };
 }
 #endif // __CURL_NETWORK_H__

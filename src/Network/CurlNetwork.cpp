@@ -63,9 +63,11 @@ namespace blockchain
         hs = curl_slist_append(hs, "Content-Type: application/json");
         curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, hs);
 
+        std::string responseBuffer;
         char *response = nullptr;
+
         curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
-        curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &response);
+        curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseBuffer);
 
         CURLcode res = curl_easy_perform(curlHandle);
         if (res != CURLE_OK)
@@ -77,24 +79,19 @@ namespace blockchain
         }
 
         long httpCode = 0;
+        
         curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &httpCode);
+        response = (char *)malloc(responseBuffer.length() + 1);
+        memcpy(response, responseBuffer.c_str(), responseBuffer.length());
+        response[responseBuffer.length()] = '\0';
 
         return HttpResponse(httpCode, response);
     }
 
-    size_t CurlNetwork::WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+    size_t CurlNetwork::WriteCallback(void *contents, size_t size, size_t nmemb, std::string *output)
     {
         size_t totalSize = size * nmemb;
-        char **responsePtr = static_cast<char **>(userp);
-
-        // Allocate memory for the response buffer
-        *responsePtr = static_cast<char *>(realloc(*responsePtr, totalSize + 1));
-        if (*responsePtr)
-        {
-            std::memcpy(*responsePtr, contents, totalSize);
-            (*responsePtr)[totalSize] = '\0'; // Null-terminate the string
-        }
-
+        output->append((char *)contents, totalSize);
         return totalSize;
     }
 }
