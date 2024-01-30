@@ -119,8 +119,8 @@ namespace blockchain
         /// @param gasLimit
         /// @param contractCall a `ContractCall` object for an RPC invocation or `nullptr` for a transaction. 
         /// @return
-        Result<BigNumber> EstimateGas(const Account *from, const Address &to,
-                                      const BigNumber &amount, const BigNumber &gasPrice,
+        Result<BigNumber> EstimateGas(const Account *from, const Address *to,
+                                      const BigNumber *amount, const BigNumber *gasPrice,
                                       const uint32_t gasLimit, const ContractCall *contractCall) const;
 
         /// @brief Return the current gas price.
@@ -130,25 +130,25 @@ namespace blockchain
         /// @brief Returns the balance (in gwei) for the provided `account`.
         /// @param account 
         /// @return
-        Result<BigNumber> GetBalance(const Address &address) const;
+        Result<BigNumber> GetBalance(const Address *address) const;
 
         /// @brief Returns the balance of an ERC20-contract address
         /// @param address 
         /// @param contractAddress 
         /// @return 
-        Result<BigNumber> GetBalance(const Address &address, const Address &contractAddress) const;
+        Result<BigNumber> GetBalance(const Address *address, const Address *contractAddress) const;
 
         /// @brief Execute a message call without creating a transaction on the block chain.
         /// @param contractCall Method exectution information
         /// @param contractAddress Address of the caller.
         /// @param contractAddress Contract address.
         /// @return
-        Result<TransactionResponse> ViewCall(const ContractCall *contractCall, const Address &callerAddress, const Address &contractAddress) const;
+        Result<TransactionResponse> ViewCall(const Address *callerAddress, const Address *contractAddress, const ContractCall *contractCall) const;
 
         /// @brief Return the number of transactions made. Used for calculating nonce.
         /// @param account 
-        /// @return 
-        Result<BigNumber> GetTransactionCount(const Account *account) const;
+        /// @return
+        Result<BigNumber> GetTransactionCount(const Address *address) const;
 
         /// @brief Send a signed transaction. This could either be a transfer or a contract call.
         /// @param from Sender account
@@ -158,10 +158,14 @@ namespace blockchain
         /// @param gasPrice Optional parameter. Gas price. If not specified, `GetGasPrice()` will be used.
         /// @param contractCall Optional parameter. If provided, this `Send` invocation is considered to be a contract execution.
         /// @return The result of the transaction.
-        Result<TransactionResponse> Send(const Account *from, const Address &to,
-                                        const BigNumber &amount, const uint32_t gasLimit,
+        Result<TransactionResponse> Send(const Account *from, const Address *to,
+                                        const BigNumber *amount, const uint32_t gasLimit,
                                         const BigNumber *gasPrice = nullptr, const ContractCall *contractCall = nullptr) const;
-        
+
+        /// @brief Returns a transaction `TransactionReceipt` for the specified transaction or `null` if no transaction was found.
+        /// @param transactionHash
+        /// @return
+        Result<TransactionReceipt*> GetTransactionReceipt(const char *transactionHash) const;
 
     private:
         const ETFactory *transactionFactory;
