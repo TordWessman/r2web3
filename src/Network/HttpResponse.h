@@ -26,6 +26,7 @@
 #define __HTTP_RESPONSE_H__
 
 #include <cstring>
+#include "../Shared/Common.h"
 
 namespace blockchain
 {
@@ -49,10 +50,8 @@ namespace blockchain
         HttpResponse(const long status, const char *responseBody) : 
             status(status),
             responseLength(strlen(responseBody) != 0 ? strlen(responseBody) + 1 : 0)
-        { 
-            body = new char[strlen(responseBody) + 1];
-            body[strlen(responseBody)] = '\0';
-            memcpy(body, responseBody, strlen(responseBody));
+        {
+            body = responseBody | char_string::copy;
         }
 
         ~HttpResponse()
@@ -71,9 +70,7 @@ namespace blockchain
 
                 if (other.body != nullptr)
                 {
-                    body = new char[strlen(other.body) + 1];
-                    body[strlen(other.body)] = '\0';
-                    memcpy(body, other.body, strlen(other.body));
+                    body = other.body | char_string::retain;
                 }
                 else
                 {
@@ -91,9 +88,7 @@ namespace blockchain
             {
                 if (other.body != nullptr)
                 {
-                    body = new char[strlen(other.body) + 1];
-                    body[strlen(other.body)] = '\0';
-                    memcpy(body, other.body, strlen(other.body));
+                    body = other.body | char_string::retain;
                 }
                 else
                 {

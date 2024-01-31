@@ -84,6 +84,8 @@ namespace blockchain
         memcpy(response, responseBuffer.c_str(), responseBuffer.length());
         response[responseBuffer.length()] = '\0';
         
+        std::cout << "----- RAW RESPONSE: " << std::endl << response << std::endl;
+        
         return HttpResponse(httpCode, response);
     }
 
