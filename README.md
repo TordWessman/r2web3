@@ -1,13 +1,11 @@
 # r2web3
-A Web3 library intended to be used for microcontrollers. Has at this point only been tested on ESP8266 and ESP32 boards.
+A Web3 library written in C++ intended to be used for microcontrollers, but should work on any platform. 
+Has at this point only been tested in Linux (g++) and ESP8266 and ESP32 boards (Arduino IDE).
 
-This project is under development. Here's a list of a few thing that's on the initial roadmap:
- * Parse errors
- * Clean up `Chain`
+This project is under development. Here's a list of a few thing that's on the roadmap:
  * Unit tests
  * ABI encoding (existing, but incomplete)
- * ABI decoding
- * Various JSON-RPC implementations (e g gas estimation, receipt retrieval etc)
+ * ABI decoding (existing, but incomplete)
  * EIP-155 support
 
 ## Installation
@@ -120,7 +118,7 @@ void getBalance() {
 void viewCall() {
   ContractCall call("add", {ENC(10u, "uint32"), ENC({ENC(20u), ENC(30u)}, "uint32[]")}); // Equivalent to method signature 'add(uint32,uint32[])'
   
-  Result<TransactionResponse> result = chain.ViewCall(&call, account.GetAddress(), contractAddress);
+  Result<TransactionResponse> result = chain.ViewCall(account.GetAddress(), contractAddress, &call);
   
   if (result.HasValue()) {
     Serial.print("Result: "); Serial.println(result.Value().Result());
@@ -131,7 +129,7 @@ void viewCall() {
 
 /// (State changing) contract call
 void mutateCall() {
-    ContractCall contractCall("setFoo", {ENC((uint32_t)random(1000,10000))}); // Equivalent to method signature 'setFoo(uint256)'
+    ContractCall contractCall("setFoo", {ENC((uint32_t)random(1000,10000))}); // Equivalent to method signature 'setFoo(uint256y)'
     BigNumber gasPrice(1234567); // chain.EstimateGas could be used instead.
     BigNumber sendAmount = BigNumber(0u);
     uint32_t gasLimit = 6721975;
@@ -148,7 +146,7 @@ void loop() {
 ```
 
 ## Secure connection (HTTPS)
-When accessing a HTTP over TLS, one must specify the root certificate for the endpoint when instantiating the `ESPNetwork`.
+When accessing a HTTP over TLS, one must specify the root certificate for the endpoint when instantiating the `ESPNetwork`. No certificates are provided and developers has to provide these for the RPC-URL:s they intend to use.
 
 Please note that `Restart()` method must be called once the WiFi connection has been established and _if_ the device clock has lost synchronization (e g after hybernation).
 
