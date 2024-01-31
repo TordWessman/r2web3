@@ -122,13 +122,13 @@ namespace blockchain
         Result<BlockInformation*> GetBlockInformation(const char *blockHash) const;
 
     private:
-        Result<char *> MakeRequst(const char* method, const std::vector<cJSON *> parameters, const bool assertStarted = true) const;
         const EthereumTransactionFactory *transactionFactory;
         const char *url;
         NetworkFacade *network;
         uint32_t id;
         bool started;
         void AssertStarted() const;
+        Result<char *> MakeRequst(const char* method, const std::vector<cJSON *> parameters, const bool assertStarted = true) const;
 
     };
 }
