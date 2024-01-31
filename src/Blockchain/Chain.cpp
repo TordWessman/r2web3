@@ -89,14 +89,10 @@ namespace blockchain
             const char *errorPtr = cJSON_GetErrorPtr();
             if (errorPtr != NULL)
             {
-                Log::e("Unable to parse:", errorPtr);
+                Result<char *>::Err(-2, "Unable to parse JSON due to unknown error");
             }
-            else
-            {
-                Log::e("Unable to parse. Null response?");
-            }
-
-            return Result<char *>::Err(-2, "Error parsing response as JSON");
+            
+            return Result<char *>::Err(-2, errorPtr);
         }
         else
         {
@@ -106,11 +102,7 @@ namespace blockchain
             {
                 if (cJSON_IsString(resultJson))
                 {
-                    char *resultString = (char *)malloc(strlen(resultJson->valuestring) + 1);
-                    memset(resultString, 0, strlen(resultJson->valuestring) + 1);
-                    memcpy(resultString, resultJson->valuestring, strlen(resultJson->valuestring));
-                    Result<char *> result(resultString);
-                    Log::m("Result:", resultJson->valuestring);
+                    Result<char *> result(resultJson->valuestring | char_string::retain);
                     cJSON_Delete(response_json);
                     return result;
                 }
@@ -133,31 +125,21 @@ namespace blockchain
             if (resultJson != NULL)
             {
                 int code = cJSON_GetObjectItem(resultJson, "code")->valueint;
-                char *message = cJSON_GetObjectItem(resultJson, "message")->valuestring;
+                char *message = cJSON_GetObjectItem(resultJson, "message")->valuestring | char_string::retain;
                 Result<char *> result = Result<char *>::Err(code, message);
                 cJSON_Delete(response_json);
                 return result;
             }
-            else
-            {
-                Log::e("No 'error'. No 'result'");
-            }
         }
 
-        cJSON_Delete(response_json);
         Log::e("JSON ERROR", cJSON_Print(response_json));
+        cJSON_Delete(response_json);
         return Result<char *>::Err(-3, "Invalid JSON");
     }
 
     Result<uint32_t> Chain::GetChainId() const
     {
-        cJSON *params = cJSON_CreateArray();
-
-        char *request_body = BaseJsonBody("eth_chainId", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-
-        free(request_body);
+        Result<char *> result = MakeRequst("eth_chainId", {}, false);
 
         if (result.HasValue())
         {
@@ -182,17 +164,7 @@ namespace blockchain
 
     Result<BigNumber> Chain::GetTransactionCount(const Address address) const
     {
-        AssertStarted();
-        cJSON *params = cJSON_CreateArray();
-
-        cJSON_AddItemToArray(params, cJSON_CreateString(address.AsString()));
-        cJSON_AddItemToArray(params, cJSON_CreateString("latest"));
-
-        char *request_body = BaseJsonBody("eth_getTransactionCount", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-
-        cJSON_free(request_body);
+        Result<char *> result = MakeRequst("eth_getTransactionCount", {cJSON_CreateString(address.AsString()), cJSON_CreateString("latest")});
 
         if (result.HasValue())
         {
@@ -201,19 +173,12 @@ namespace blockchain
             return count;
         }
 
-        return Result<BigNumber>::Err(result.ErrorCode());
+        return Result<BigNumber>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
     Result<TransactionReceipt*> Chain::GetTransactionReceipt(const char *transactionHash) const
     {
-        AssertStarted();
-        cJSON *params = cJSON_CreateArray();
-        cJSON_AddItemToArray(params, cJSON_CreateString(transactionHash));
-        char *request_body = BaseJsonBody("eth_getTransactionReceipt", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-
-        cJSON_free(request_body);
+        Result<char *> result = MakeRequst("eth_getBlockByHash", {cJSON_CreateString(transactionHash)});
 
         if (result.HasValue())
         {
@@ -234,15 +199,7 @@ namespace blockchain
 
     Result<BlockInformation*> Chain::GetBlockInformation(const char *blockHash) const
     {
-        AssertStarted();
-        cJSON *params = cJSON_CreateArray();
-        cJSON_AddItemToArray(params, cJSON_CreateString(blockHash));
-        cJSON_AddItemToArray(params, cJSON_CreateBool(false));
-        char *request_body = BaseJsonBody("eth_getBlockByHash", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-
-        cJSON_free(request_body);
+        Result<char *> result = MakeRequst("eth_getBlockByHash", {cJSON_CreateString(blockHash), cJSON_CreateBool(false)});
 
         if (result.HasValue())
         {
@@ -263,29 +220,20 @@ namespace blockchain
 
     Result<TransactionResponse> Chain::ViewCall(const Address callerAddress, const Address contractAddress, const ContractCall *contractCall) const
     {
-        AssertStarted();
+        char *dataAsHexString = (contractCall->AsData() | byte_array::hex_string) | char_string::add_hex_prefix;
         cJSON *callCJson = cJSON_CreateObject();
-        cJSON *params = cJSON_CreateArray();
-
         cJSON_AddStringToObject(callCJson, "from", callerAddress.AsString());
         cJSON_AddStringToObject(callCJson, "to", contractAddress.AsString());
-        char *dataAsHexString = (contractCall->AsData() | byte_array::hex_string) | char_string::add_hex_prefix;
-
         cJSON_AddStringToObject(callCJson, "data", dataAsHexString);
         free(dataAsHexString);
-        cJSON_AddItemToArray(params, callCJson);
-        cJSON_AddItemToArray(params, cJSON_CreateString("latest"));
 
-        char *request_body = BaseJsonBody("eth_call", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-        cJSON_free(request_body);
+        Result<char *> result = MakeRequst("eth_call", {callCJson, cJSON_CreateString("latest")});
 
         if (result.HasValue())
         {
             return Result<TransactionResponse>(result.Value());
         }
-        return Result<TransactionResponse>::Err(result.ErrorCode());
+        return Result<TransactionResponse>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
     Result<TransactionResponse> Chain::Send(const Account *from, const Address to,
@@ -314,31 +262,15 @@ namespace blockchain
             gp = gasPriceResult.Value();
         }
 
-        EthereumTransactionProperties p(nonce, gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
-
-        std::vector<uint8_t> pk = from->GetPrivateKey();
-
-        EthereumTransaction tx = transactionFactory->GenerateTransaction(p, &pk);
-
-        std::vector<uint8_t> serializedTransaction = tx.Serialize();
-
-        cJSON *params = cJSON_CreateArray();
-        char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
-        cJSON_AddItemToArray(params, cJSON_CreateString(parameter));
-        Log::m("Transaciton data: ", parameter);
+        char *parameter = transactionFactory->GenerateSerializedData(from, EthereumTransactionProperties(nonce, gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id));
+        Result<char *> result = MakeRequst("eth_sendRawTransaction", {cJSON_CreateString(parameter)});
         delete[] parameter;
-
-        char *request_body = BaseJsonBody("eth_sendRawTransaction", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-
-        cJSON_free(request_body);
 
         if (result.HasValue())
         {
             return Result<TransactionResponse>(result.Value());
         }
-        return Result<TransactionResponse>::Err(result.ErrorCode());
+        return Result<TransactionResponse>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
     Result<BigNumber> Chain::EstimateGas(const Account *from, const Address to,
@@ -367,24 +299,9 @@ namespace blockchain
             gp = gasPriceResult.Value();
         }
 
-        EthereumTransactionProperties p(nonce, gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id);
-
-        std::vector<uint8_t> pk = from->GetPrivateKey();
-
-        EthereumTransaction tx = transactionFactory->GenerateTransaction(p, &pk);
-
-        std::vector<uint8_t> serializedTransaction = tx.Serialize();
-
-        cJSON *params = cJSON_CreateArray();
-        char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
-        cJSON_AddItemToArray(params, cJSON_CreateString(parameter));
+        char *parameter = transactionFactory->GenerateSerializedData(from, EthereumTransactionProperties(nonce, gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id));
+        Result<char *> result = MakeRequst("eth_estimateGas", {cJSON_CreateString(parameter)});
         delete[] parameter;
-
-        char *request_body = BaseJsonBody("eth_estimateGas", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-
-        cJSON_free(request_body);
 
         if (result.HasValue())
         {
@@ -392,19 +309,12 @@ namespace blockchain
             free(result.Value());
             return gasPrice;
         }
-        return Result<BigNumber>::Err(result.ErrorCode());
+        return Result<BigNumber>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
     Result<BigNumber> Chain::GetGasPrice() const
     {
-        AssertStarted();
-        cJSON *params = cJSON_CreateArray();
-
-        char *request_body = BaseJsonBody("eth_gasPrice", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-
-        cJSON_free(request_body);
+        Result<char *> result = MakeRequst("eth_gasPrice", {});
 
         if (result.HasValue())
         {
@@ -413,22 +323,29 @@ namespace blockchain
             return count;
         }
 
-        return Result<BigNumber>::Err(result.ErrorCode());
+        return Result<BigNumber>::Err(result.ErrorCode(), result.ErrorMessage());
+    }
+
+    Result<char *> Chain::MakeRequst(const char* method, const std::vector<cJSON *> parameters, const bool assertStarted) const {
+
+        if (assertStarted) {
+            AssertStarted();
+        }
+        
+        cJSON *params = cJSON_CreateArray();
+        for(cJSON *parameter : parameters) {
+            cJSON_AddItemToArray(params, parameter);
+        }
+
+        char *request_body = BaseJsonBody(method, params);
+        Result<char *> result = DoRequestYo(network, url, request_body);
+        cJSON_free(request_body);
+        return result;
     }
 
     Result<BigNumber> Chain::GetBalance(const Address address) const
     {
-        AssertStarted();
-        cJSON *params = cJSON_CreateArray();
-
-        cJSON_AddItemToArray(params, cJSON_CreateString(address.AsString()));
-        cJSON_AddItemToArray(params, cJSON_CreateString("latest"));
-
-        char *request_body = BaseJsonBody("eth_getBalance", params);
-
-        Result<char *> result = DoRequestYo(network, url, request_body);
-
-        cJSON_free(request_body);
+        Result<char *> result = MakeRequst("eth_getBalance", {cJSON_CreateString(address.AsString()), cJSON_CreateString("latest")});
 
         if (result.HasValue())
         {
@@ -437,7 +354,7 @@ namespace blockchain
             return count;
         }
 
-        return Result<BigNumber>::Err(result.ErrorCode());
+        return Result<BigNumber>::Err(result.ErrorCode(), result.ErrorMessage());
     }
 
     void Chain::AssertStarted() const

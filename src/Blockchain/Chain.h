@@ -31,6 +31,7 @@
 #include "../Shared/Common.h"
 #include "../Shared/cJSON.h"
 #include "../Shared/BigNumber.h"
+#include "../Shared/R2Web3Log.h"
 #include "../Network/NetworkFacade.h"
 #include "Account.h"
 #include "EthereumSigner.h"
@@ -45,13 +46,21 @@ namespace blockchain
     class TFactoryInterface
     {
     public:
-        virtual TransactionType GenerateTransaction(TransactionProperties &properties, std::vector<uint8_t> *privateKey) const
+        virtual TransactionType GenerateTransaction(const TransactionProperties &properties, std::vector<uint8_t> *privateKey) const
     #ifndef ARDUINO
         {  throw std::runtime_error("<>::GenerateTransaction() must be overloaded"); }
     #else
             = 0;
     #endif
+
+        virtual char* GenerateSerializedData(const Account *account, const EthereumTransactionProperties properties) const
+    #ifndef ARDUINO
+        {throw std::runtime_error("<>::GenerateTransaction() must be overloaded");}
+    #else
+                = 0;
+    #endif
     };
+    
 
     /// @brief Default `TFactoryInterface` implementation, responsible for signing ethereum-compatible transactions.
     class ETFactory : TFactoryInterface<EthereumTransactionProperties, EthereumTransaction>
@@ -69,13 +78,27 @@ namespace blockchain
         /// @param properties Transaction information.
         /// @param privateKey Key used to sign the transaction.
         /// @return A signed transaction.
-        EthereumTransaction GenerateTransaction(EthereumTransactionProperties &properties, std::vector<uint8_t> *privateKey) const override
+        EthereumTransaction GenerateTransaction(const EthereumTransactionProperties &properties, std::vector<uint8_t> *privateKey) const override
         {
             EthereumTransaction t_unsigned(properties);
 
             EthereumTransaction t_signed = signer->Sign(&t_unsigned, privateKey);
 
             return t_signed;
+        }
+
+        char* GenerateSerializedData(const Account *account, const EthereumTransactionProperties properties) const override {
+            std::vector<uint8_t> pk = account->GetPrivateKey();
+
+            EthereumTransaction tx = GenerateTransaction(properties, &pk);
+
+            std::vector<uint8_t> serializedTransaction = tx.Serialize();
+
+            char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
+            //TEMP:
+            Log::m("Transaciton data: ", parameter);
+            return parameter;
+ 
         }
 
         ETFactory &operator=(const ETFactory &other)
@@ -173,6 +196,7 @@ namespace blockchain
         Result<BlockInformation*> GetBlockInformation(const char *blockHash) const;
 
     private:
+        Result<char *> MakeRequst(const char* method, const std::vector<cJSON *> parameters, const bool assertStarted = true) const;
         const ETFactory *transactionFactory;
         const char *url;
         NetworkFacade *network;

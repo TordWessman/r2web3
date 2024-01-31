@@ -29,6 +29,7 @@
 
 #include "../Shared/cJSON.h"
 #include "../Shared/BigNumber.h"
+#include "../Shared/Common.h"
 #include "Address.h"
 
 namespace blockchain
@@ -51,9 +52,7 @@ namespace blockchain
         {
             if (other.result != nullptr)
             {
-                result = new char[strlen(other.result) + 1];
-                result[strlen(other.result)] = '\0';
-                memcpy(result, other.result, strlen(other.result));
+                result = other.result | char_string::retain;
             }
             else
             {
@@ -78,9 +77,7 @@ namespace blockchain
             {
                 if (other.result != nullptr)
                 {
-                    result = new char[strlen(other.result) + 1];
-                    result[strlen(other.result)] = '\0';
-                    memcpy(result, other.result, strlen(other.result));
+                    result = other.result | char_string::retain;
                 }
                 else
                 {
