@@ -34,93 +34,19 @@
 #include "../Shared/R2Web3Log.h"
 #include "../Network/NetworkFacade.h"
 #include "Account.h"
-#include "EthereumSigner.h"
-#include "Signer.h"
 #include "TransactionResponse.h"
 #include "Contract.h"
+#include "TransactionFactory.h"
+#include "EthereumTransactionFactory.h"
 
 namespace blockchain
 {
-    /// @brief Interface for transaction generation (`TransactionType`s) using transaction information (`TransactionProperties`).
-    template <typename TransactionProperties, typename TransactionType>
-    class TFactoryInterface
-    {
-    public:
-        virtual TransactionType GenerateTransaction(const TransactionProperties &properties, std::vector<uint8_t> *privateKey) const
-    #ifndef ARDUINO
-        {  throw std::runtime_error("<>::GenerateTransaction() must be overloaded"); }
-    #else
-            = 0;
-    #endif
-
-        virtual char* GenerateSerializedData(const Account *account, const EthereumTransactionProperties properties) const
-    #ifndef ARDUINO
-        {throw std::runtime_error("<>::GenerateTransaction() must be overloaded");}
-    #else
-                = 0;
-    #endif
-    };
-    
-
-    /// @brief Default `TFactoryInterface` implementation, responsible for signing ethereum-compatible transactions.
-    class ETFactory : TFactoryInterface<EthereumTransactionProperties, EthereumTransaction>
-    {
-    public:
-
-        ETFactory() : signer(new EthereumSigner()) {}
-
-        ~ETFactory()
-        {
-            delete signer;
-        }
-
-        /// @brief Creates and signs a transaction. 
-        /// @param properties Transaction information.
-        /// @param privateKey Key used to sign the transaction.
-        /// @return A signed transaction.
-        EthereumTransaction GenerateTransaction(const EthereumTransactionProperties &properties, std::vector<uint8_t> *privateKey) const override
-        {
-            EthereumTransaction t_unsigned(properties);
-
-            EthereumTransaction t_signed = signer->Sign(&t_unsigned, privateKey);
-
-            return t_signed;
-        }
-
-        char* GenerateSerializedData(const Account *account, const EthereumTransactionProperties properties) const override {
-            std::vector<uint8_t> pk = account->GetPrivateKey();
-
-            EthereumTransaction tx = GenerateTransaction(properties, &pk);
-
-            std::vector<uint8_t> serializedTransaction = tx.Serialize();
-
-            char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
-            //TEMP:
-            Log::m("Transaciton data: ", parameter);
-            return parameter;
- 
-        }
-
-        ETFactory &operator=(const ETFactory &other)
-        {
-            if (this != &other)
-            {
-                delete signer;
-                signer = other.signer->clone();
-            }
-            return *this;
-        }
-
-    private:
-        const Signer<EthereumTransaction> *signer;
-    };
-
     /// @brief Interface to a EVM-compatible blockchain.
     class Chain
     {
     public:
-        Chain(const char *rpcUrl, NetworkFacade *networkFacade) : url(rpcUrl), network(networkFacade), transactionFactory(new ETFactory()), id(0) {}
-        Chain(const char *rpcUrl, NetworkFacade *networkFacade, const uint32_t chainId) : url(rpcUrl), network(networkFacade), transactionFactory(new ETFactory()), id(chainId) {}
+        Chain(const char *rpcUrl, NetworkFacade *networkFacade) : url(rpcUrl), network(networkFacade), transactionFactory(new EthereumTransactionFactory()), id(0) {}
+        Chain(const char *rpcUrl, NetworkFacade *networkFacade, const uint32_t chainId) : url(rpcUrl), network(networkFacade), transactionFactory(new EthereumTransactionFactory()), id(chainId) {}
 
         ~Chain() 
         {
@@ -197,7 +123,7 @@ namespace blockchain
 
     private:
         Result<char *> MakeRequst(const char* method, const std::vector<cJSON *> parameters, const bool assertStarted = true) const;
-        const ETFactory *transactionFactory;
+        const EthereumTransactionFactory *transactionFactory;
         const char *url;
         NetworkFacade *network;
         uint32_t id;
