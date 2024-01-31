@@ -95,7 +95,7 @@ namespace blockchain
         }
 
     private:
-        Result(int errorCode, bool hasValue) : hasValue(hasValue), errorCode(errorCode), errorMessage(nullptr) {}
+        Result(int errorCode, bool hasValue) : hasValue(hasValue), errorCode(errorCode), errorMessage("(error)") {}
         Result(int errorCode, const char *errorMessage) : hasValue(false), errorCode(errorCode), errorMessage(errorMessage) {}
 
         bool hasValue;
@@ -196,6 +196,15 @@ namespace blockchain
         {
             bool operator()(char *v);
         };
+        struct retain_t
+        {
+            char* operator()(char *v);
+        };
+        struct copy_t
+        {
+            char* operator()(const char *v);
+        };
+
 
         /// @brief __DEALLOCATES__ input and returns a new string with the "0x" prefix.
         /// Please note that the returned string needs to be deallocated manually.
@@ -207,11 +216,17 @@ namespace blockchain
         const remove_hex_prefix_t remove_hex_prefix = {};
         /// @brief Returns true if string is NULL or "null".
         const is_null_t is_null = {};
+        /// @brief Creates a retained (allocated) version of the char *
+        const retain_t retain = {};
+        /// @brief Creates a retained (allocated) version of the const char *
+        const copy_t copy = {};
 
         char *operator|(char *v, add_hex_prefix_t f);
         string_info operator|(const string_info &v, ltrim_t f);
         string_info operator|(const string_info &v, remove_hex_prefix_t f);
         bool operator|(char *v, is_null_t f);
+        char *operator|(char *v, retain_t f);
+        char *operator|(const char *v, copy_t f);
     }
 }
 #endif

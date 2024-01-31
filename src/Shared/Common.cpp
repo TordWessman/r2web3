@@ -224,10 +224,28 @@ namespace blockchain
             return false;
         }
 
+        char* retain_t::operator()(char *v)
+        {
+            char *result = (char *)malloc(strlen(v) + 1);
+            memccpy(result, v, 0, strlen(v));
+            result[strlen(v)] = '\0';
+            return result;
+        }
+
+        char *copy_t::operator()(const char *v)
+        {
+            char *result = (char *)malloc(strlen(v) + 1);
+            memccpy(result, v, 0, strlen(v));
+            result[strlen(v)] = '\0';
+            return result;
+        }
+
         char* operator|(char *v, add_hex_prefix_t f) { return f(v); }
         string_info operator|(const string_info &v, ltrim_t f) { return f(v); }
         string_info operator|(const string_info &v, remove_hex_prefix_t f) { return f(v); }
         bool operator|(char *v, is_null_t f) { return f(v); }
+        char* operator|(char *v, retain_t f) { return f(v); }
+        char *operator|(const char *v, copy_t f) { return f(v); }
     }
 
 }
