@@ -49,8 +49,8 @@ namespace blockchain
         /// @param signature
         EthereumSignature(uint32_t v, const std::vector<uint8_t> signature)
             : v(v),
-            r(signature.begin(), signature.begin() + (signature.size() / 2)),
-            s(signature.begin() + (signature.size() / 2), signature.end())
+              r(std::vector<uint8_t>(signature.begin(), signature.begin() + signature.size() / 2) | byte_array::truncate),
+              s(std::vector<uint8_t>(signature.begin() + signature.size() / 2, signature.end()) | byte_array::truncate)
 
         {}
 
