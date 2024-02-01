@@ -26,6 +26,7 @@
 #define __ADDRESS__H__
 
 #include <vector>
+#include <cstring>
 
 namespace blockchain
 {       
@@ -35,6 +36,14 @@ namespace blockchain
     class Address
     {
     public:
+
+        /// @brief Instantiate an empty address.
+        Address() {
+            memset(address, '0', sizeof(address));
+            address[0] = '0';
+            address[1] = 'x';
+        }
+
         /// @brief Create an `Address` using the last `ETH_ADDRESS_LENGTH` bytes.
         /// @param bytes
         Address(const std::vector<uint8_t> *bytes)

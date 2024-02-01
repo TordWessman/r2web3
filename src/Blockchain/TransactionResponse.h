@@ -26,6 +26,7 @@
 #define __TRANSACTION_RESPONSE_H__
 
 #include <cstring>
+#include <vector>
 
 #include "../Shared/cJSON.h"
 #include "../Shared/BigNumber.h"
@@ -98,9 +99,10 @@ namespace blockchain
     /// @brief Transaction information
     struct TransactionReceipt
     {
+        TransactionReceipt() {}
+
         TransactionReceipt(cJSON *result) : blockNumber(cJSON_GetObjectItemCaseSensitive(result, "blockNumber")->valuestring),
                                             cumulativeGasUsed(cJSON_GetObjectItemCaseSensitive(result, "cumulativeGasUsed")->valuestring),
-                                            effectiveGasPrice(cJSON_GetObjectItemCaseSensitive(result, "effectiveGasPrice")->valuestring),
                                             gasUsed(cJSON_GetObjectItemCaseSensitive(result, "gasUsed")->valuestring),
                                             from(cJSON_GetObjectItemCaseSensitive(result, "from")->valuestring),
                                             to(cJSON_GetObjectItemCaseSensitive(result, "to")->valuestring)
@@ -113,17 +115,46 @@ namespace blockchain
         char blockHash[ETH_BLOCK_HASH_SIZE + 2 + 1]; //Fit the leading `0x` and the trailing null-termination character.
         BigNumber blockNumber;
         BigNumber cumulativeGasUsed;
-        BigNumber effectiveGasPrice;
         BigNumber gasUsed;
         Address from;
         Address to;
-    };
 
+        #define TransactionReceipt_Keys "blockNumber", "cumulativeGasUsed", "gasUsed", "from", "to"
+
+        static Result<TransactionReceipt *> Parse(cJSON *result)
+        {
+
+            for (const char *key : {TransactionReceipt_Keys}) 
+            {
+                if (!cJSON_HasObjectItem(result, key)) 
+                {
+                    return Result<TransactionReceipt *>::Err(-40, key);
+                }
+            }
+            return Result<TransactionReceipt *>(new TransactionReceipt(result));
+        }
+    };
+    
     /// @brief Information about a mined block.
-    struct BlockInformation {
+    struct BlockInformation
+    {
 
         BlockInformation(cJSON *result) : timestamp(BigNumber(cJSON_GetObjectItemCaseSensitive(result, "timestamp")->valuestring).ToUInt32()) {}
         uint32_t timestamp;
+
+        #define BlockInformation_Keys "timestamp"
+        static Result<BlockInformation *> Parse(cJSON *result)
+        {
+
+            for (const char *key : {BlockInformation_Keys})
+            {
+                if (!cJSON_HasObjectItem(result, key))
+                {
+                    return Result<BlockInformation *>::Err(-40, key);
+                }
+            }
+            return Result<BlockInformation *>(new BlockInformation(result));
+        }
     };
 }
 #endif

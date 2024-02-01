@@ -55,10 +55,11 @@ namespace blockchain
 
         bool Start();
         bool Started() { return started; }
+        uint32_t Id() { return id; }
 
         /// @brief Return the chain id.
         /// @return 
-        Result<uint32_t> GetChainId() const;
+        Result<uint32_t> LoadChainId() const;
 
         /// @brief Returns the estimated gas price for a transaction
         /// @param from

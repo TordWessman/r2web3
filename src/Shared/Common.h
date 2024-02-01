@@ -42,10 +42,25 @@
 namespace blockchain
 {
 
+    /// @brief Implementations can contain error information.
+    class ErrorDescription
+    {
+
+    public:
+        /// @brief Returns the provided error-code or `0` if no error code was provided.
+        /// @return
+        virtual int ErrorCode() const = 0;
+
+        /// @brief Returns an error message if provided.
+        /// @return
+        virtual const char *ErrorMessage() const = 0;
+
+    };
+
     /// @brief A simple enumeration for wrapping an "optional" value as a "success" or "failure".
     /// The value contained is not memory managed and might have to be manually deallocated.
     template <typename T>
-    class Result
+    class Result : public ErrorDescription
     {
     public:
         /// @brief Creates a "successful" result.
@@ -62,6 +77,8 @@ namespace blockchain
         /// @param errorMessage
         /// @return
         static Result<T> Err(int errorCode, const char *errorMessage) { return Result<T>(errorCode, errorMessage); }
+
+        static Result<T> Err(const ErrorDescription &errorDescription) { return Result<T>(errorDescription.ErrorCode(), errorDescription.ErrorMessage()); }
 
         /// @brief Returns `true` if the result was "successful".
         /// @return
@@ -81,11 +98,11 @@ namespace blockchain
 
         /// @brief Returns the provided error-code or `0` if no error code was provided.
         /// @return
-        int ErrorCode() const { return errorCode; }
+        int ErrorCode() const override { return errorCode; }
 
         /// @brief Returns an error message if provided.
         /// @return
-        const char *ErrorMessage() const
+        const char *ErrorMessage() const override
         {
             if (errorMessage == nullptr)
             {

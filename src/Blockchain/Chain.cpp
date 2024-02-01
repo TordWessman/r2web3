@@ -33,7 +33,7 @@ namespace blockchain
     {
         if (id == 0)
         {
-            Result<uint32_t> chainIdResult = GetChainId();
+            Result<uint32_t> chainIdResult = LoadChainId();
             if (chainIdResult.HasValue())
             {
                 id = chainIdResult.Value();
@@ -48,7 +48,7 @@ namespace blockchain
         return true;
     }
 
-    Result<uint32_t> Chain::GetChainId() const
+    Result<uint32_t> Chain::LoadChainId() const
     {
         Result<char *> result = MakeRequst("eth_chainId", {}, false);
 
@@ -59,18 +59,18 @@ namespace blockchain
             return Result<uint32_t>(value);
         }
 
-        return Result<uint32_t>::Err(result.ErrorCode(), result.ErrorMessage());
+        return Result<uint32_t>::Err(result);
     }
 
     Result<BigNumber> Chain::GetBalance(const Address address, const Address contractAddress) const
     {
         ContractCall getBalanceCall("balanceOf", {ENC(address)});
-        Result<TransactionResponse> response = ViewCall(address, contractAddress, &getBalanceCall);
-        if (response.HasValue())
+        Result<TransactionResponse> result = ViewCall(address, contractAddress, &getBalanceCall);
+        if (result.HasValue())
         {
-            return Result<BigNumber>(response.Value().Result());
+            return Result<BigNumber>(result.Value().Result());
         }
-        return Result<BigNumber>::Err(response.ErrorCode(), response.ErrorMessage());
+        return Result<BigNumber>::Err(result);
     }
 
     Result<BigNumber> Chain::GetTransactionCount(const Address address) const
@@ -84,12 +84,12 @@ namespace blockchain
             return count;
         }
 
-        return Result<BigNumber>::Err(result.ErrorCode(), result.ErrorMessage());
+        return Result<BigNumber>::Err(result);
     }
 
     Result<TransactionReceipt*> Chain::GetTransactionReceipt(const char *transactionHash) const
     {
-        Result<char *> result = MakeRequst("eth_getBlockByHash", {cJSON_CreateString(transactionHash)});
+        Result<char *> result = MakeRequst("eth_getTransactionReceipt", {cJSON_CreateString(transactionHash)});
 
         if (result.HasValue())
         {
@@ -101,11 +101,11 @@ namespace blockchain
             {
                 cJSON *json = cJSON_Parse(result.Value());
                 free(result.Value());
-                return Result<TransactionReceipt*>(new TransactionReceipt(json));
+                return TransactionReceipt::Parse(json);
             }
         }
-        
-        return Result<TransactionReceipt*>::Err(result.ErrorCode(), result.ErrorMessage());
+
+        return Result<TransactionReceipt *>::Err(result);
     }
 
     Result<BlockInformation*> Chain::GetBlockInformation(const char *blockHash) const
@@ -122,11 +122,11 @@ namespace blockchain
             {
                 cJSON *json = cJSON_Parse(result.Value());
                 free(result.Value());
-                return Result<BlockInformation *>(new BlockInformation(json));
+                return BlockInformation::Parse(json);
             }
         }
 
-        return Result<BlockInformation *>::Err(result.ErrorCode(), result.ErrorMessage());
+        return Result<BlockInformation *>::Err(result);
     }
 
     Result<TransactionResponse> Chain::ViewCall(const Address callerAddress, const Address contractAddress, const ContractCall *contractCall) const
@@ -181,7 +181,7 @@ namespace blockchain
         {
             return Result<TransactionResponse>(result.Value());
         }
-        return Result<TransactionResponse>::Err(result.ErrorCode(), result.ErrorMessage());
+        return Result<TransactionResponse>::Err(result);
     }
 
     Result<BigNumber> Chain::EstimateGas(const Account *from, const Address to,
@@ -220,7 +220,7 @@ namespace blockchain
             free(result.Value());
             return gasPrice;
         }
-        return Result<BigNumber>::Err(result.ErrorCode(), result.ErrorMessage());
+        return Result<BigNumber>::Err(result);
     }
 
     Result<BigNumber> Chain::GetGasPrice() const
@@ -234,7 +234,7 @@ namespace blockchain
             return count;
         }
 
-        return Result<BigNumber>::Err(result.ErrorCode(), result.ErrorMessage());
+        return Result<BigNumber>::Err(result);
     }
 
     Result<BigNumber> Chain::GetBalance(const Address address) const
@@ -248,7 +248,7 @@ namespace blockchain
             return count;
         }
 
-        return Result<BigNumber>::Err(result.ErrorCode(), result.ErrorMessage());
+        return Result<BigNumber>::Err(result);
     }
 
     Result<char *> Chain::MakeRequst(const char* method, const std::vector<cJSON *> parameters, const bool assertStarted) const {
