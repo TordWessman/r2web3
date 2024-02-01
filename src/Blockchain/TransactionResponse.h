@@ -36,7 +36,7 @@
 namespace blockchain
 {
     
-    #define ETH_BLOCK_HASH_SIZE 64
+    #define ETH_HASH_SIZE 64
 
     /// @brief Arbitrary response container for requests. Will contain the `"result"` value for an ethereum request.
     class TransactionResponse
@@ -108,18 +108,22 @@ namespace blockchain
                                             to(cJSON_GetObjectItemCaseSensitive(result, "to")->valuestring)
         {
             char *bhash = cJSON_GetObjectItemCaseSensitive(result, "blockHash")->valuestring;
-            strncpy(blockHash, bhash, ETH_BLOCK_HASH_SIZE + 2);
-            blockHash[ETH_BLOCK_HASH_SIZE + 2] = '\0';
+            strncpy(blockHash, bhash, ETH_HASH_SIZE + 2);
+            blockHash[ETH_HASH_SIZE + 2] = '\0';
+            char *thash = cJSON_GetObjectItemCaseSensitive(result, "transactionHash")->valuestring;
+            strncpy(transactionHash, thash, ETH_HASH_SIZE + 2);
+            transactionHash[ETH_HASH_SIZE + 2] = '\0';
         }
 
-        char blockHash[ETH_BLOCK_HASH_SIZE + 2 + 1]; //Fit the leading `0x` and the trailing null-termination character.
+        char blockHash[ETH_HASH_SIZE + 2 + 1]; //Fit the leading `0x` and the trailing null-termination character.
+        char transactionHash[ETH_HASH_SIZE + 2 + 1];
         BigNumber blockNumber;
         BigNumber cumulativeGasUsed;
         BigNumber gasUsed;
         Address from;
         Address to;
 
-        #define TransactionReceipt_Keys "blockNumber", "cumulativeGasUsed", "gasUsed", "from", "to"
+        #define TransactionReceipt_Keys "blockNumber", "cumulativeGasUsed", "gasUsed", "from", "to", "transactionHash"
 
         static Result<TransactionReceipt *> Parse(cJSON *result)
         {
