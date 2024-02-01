@@ -63,6 +63,13 @@ namespace blockchain
         /// @param addressString 
         Address(const char *addressString)
         {
+            if (addressString == NULL)
+            {
+                memset(address, '0', sizeof(address));
+                address[0] = '0';
+                address[1] = 'x';
+                return;
+            }
             if (addressString[0] == '0' && (addressString[1] == 'x' || addressString[1] == 'X'))
             {
                 for (size_t i = 0; i < ETH_ADDRESS_LENGTH; i++) { address[i] = addressString[i]; }
