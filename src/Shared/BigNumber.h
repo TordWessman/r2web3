@@ -69,7 +69,8 @@ namespace blockchain
             if (other.hexString != nullptr)
             {
                 hexString = new char[strlen(other.hexString) + 1];
-                memcpy(hexString, other.hexString, strlen(other.hexString) + 1);
+                memcpy(hexString, other.hexString, strlen(other.hexString));
+                hexString[strlen(other.hexString)] = '\0';
             }
             data = other.data;
         }

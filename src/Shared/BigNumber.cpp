@@ -50,7 +50,7 @@ namespace blockchain
         return str;
     }
 
-    /// @brief remove any leading '0' characters. Warning! This method will free(str).
+    /// @brief remove any leading '0' characters. Warning! This method will delete []str.
     /// @param str
     /// @return
     char *removeLeadingZeros(char *str)
@@ -70,7 +70,7 @@ namespace blockchain
 
         char *result = new char[result_size];
         memcpy(result, str + i, result_size);
-        free(str);
+        delete []str;
         return result;
     }
 
@@ -96,7 +96,7 @@ namespace blockchain
             }
         }
 
-        char *resultString = (char *)malloc(length + 1);
+        char *resultString = new char[length + 1];
         resultString[length] = '\0';
 
         for (size_t i = 0; i < length - 1; i++)
@@ -140,7 +140,7 @@ namespace blockchain
             }
         }
 
-        char *resultString = (char *)malloc(length + 1);
+        char *resultString = new char[length + 1];
         resultString[length] = '\0';
 
         for (size_t i = 0; i < length - 1; i++)
@@ -160,7 +160,7 @@ namespace blockchain
     BigNumber::BigNumber()
     {
         hexString = new char[1];
-        hexString[0] = '\n';
+        hexString[0] = '\0';
     }
 
     BigNumber::BigNumber(uint32_t value)

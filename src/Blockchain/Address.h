@@ -27,10 +27,11 @@
 
 #include <vector>
 #include <cstring>
+#include <cassert>
 
 namespace blockchain
 {       
-    #define ETH_ADDRESS_LENGTH (64 + 2)
+    #define ETH_ADDRESS_LENGTH 42
 
     /// @brief Represents a blockchain address.
     class Address
@@ -42,6 +43,7 @@ namespace blockchain
             memset(address, '0', sizeof(address));
             address[0] = '0';
             address[1] = 'x';
+            address[sizeof(address)] = '\0';
         }
 
         /// @brief Create an `Address` using the last `ETH_ADDRESS_LENGTH` bytes.
@@ -70,15 +72,18 @@ namespace blockchain
                 address[1] = 'x';
                 return;
             }
+
+            assert(strlen(addressString) == ETH_ADDRESS_LENGTH || strlen(addressString) == ETH_ADDRESS_LENGTH - 2);
+
             if (addressString[0] == '0' && (addressString[1] == 'x' || addressString[1] == 'X'))
             {
                 for (size_t i = 0; i < ETH_ADDRESS_LENGTH; i++) { address[i] = addressString[i]; }
             }
             else
             {
-                for (size_t i = 2; i < ETH_ADDRESS_LENGTH; i++) { address[i] = addressString[i - 2]; }
-                address[0] = '0'; address[1] = 'x';
+                for (size_t i = 0; i < ETH_ADDRESS_LENGTH - 2; i++) { address[i + 2] = addressString[i]; }
             }
+            address[0] = '0'; address[1] = 'x';
             address[ETH_ADDRESS_LENGTH] = '\0';
         }
 

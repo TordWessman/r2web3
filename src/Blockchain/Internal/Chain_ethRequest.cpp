@@ -79,7 +79,7 @@ namespace blockchain
         else
         {
             cJSON *resultJson = cJSON_GetObjectItemCaseSensitive(response_json, "result");
-
+            
             if (resultJson != NULL)
             {
                 if (cJSON_IsString(resultJson))
@@ -93,6 +93,7 @@ namespace blockchain
                     char *json_str = cJSON_Print(resultJson);
                     if (json_str | char_string::is_null)
                     {
+                        cJSON_Delete(response_json);
                         free(json_str);
                         return Result<char *>(nullptr);
                     }

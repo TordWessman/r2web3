@@ -107,7 +107,7 @@ void getBalance() {
     // Retrieve tha balance and convert it into a human-friendly decimal string.
     char *balanceDecimalString = balanceResult.Value().GenerateDecimalString();
     Serial.print("Balance: "); Serial.println(balanceDecimalString);
-    free(balanceDecimalString);
+    delete []balanceDecimalString;
   }
 
   // Retrieve the balance of an ERC-20 contract

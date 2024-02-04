@@ -43,7 +43,7 @@ namespace blockchain
         /// @brief Creates a response object. Please note that `responseBody` will be managed by this instance and must therefore not be deallocated separately.
         HttpResponse(const long status, char *responseBody) : 
             status(status),
-            responseLength(strlen(responseBody) + 1),
+            responseLength(responseBody != nullptr ? strlen(responseBody) + 1 : 0),
             body(responseBody) { }
 
         /// @brief Creates a response object by copying the contents of `responseBody`.
@@ -58,7 +58,7 @@ namespace blockchain
         {
             if (body != nullptr)
             {
-                delete body;
+                delete []body;
             }
         }
 

@@ -53,7 +53,7 @@ namespace blockchain
         if (!curlHandle)
         {
             THROW("Failed to initialize cURL.");
-            return HttpResponse(-1);
+            return HttpResponse(-2);
         }
 
         curl_easy_setopt(curlHandle, CURLOPT_URL, url);
@@ -70,6 +70,8 @@ namespace blockchain
         curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseBuffer);
 
         CURLcode res = curl_easy_perform(curlHandle);
+        curl_slist_free_all(hs);
+        
         if (res != CURLE_OK)
         {
             const char *error = curl_easy_strerror(res);
@@ -80,11 +82,11 @@ namespace blockchain
 
         long httpCode = 0;
         curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &httpCode);
-        response = (char *)malloc(responseBuffer.length() + 1);
+        response = new char[responseBuffer.length() + 1];
         memcpy(response, responseBuffer.c_str(), responseBuffer.length());
         response[responseBuffer.length()] = '\0';
         
-        std::cout << "----- RAW RESPONSE: " << std::endl << response << std::endl;
+        //std::cout << "----- RAW RESPONSE: " << std::endl << response << std::endl;
         
         return HttpResponse(httpCode, response);
     }

@@ -55,7 +55,7 @@ namespace blockchain
         if (result.HasValue())
         {
             uint32_t value = strtol(result.Value(), nullptr, 16);
-            free(result.Value());
+            delete []result.Value();
             return Result<uint32_t>(value);
         }
 
@@ -80,7 +80,7 @@ namespace blockchain
         if (result.HasValue())
         {
             BigNumber count(result.Value());
-            free(result.Value());
+            delete []result.Value();
             return count;
         }
 
@@ -101,7 +101,9 @@ namespace blockchain
             {
                 cJSON *json = cJSON_Parse(result.Value());
                 free(result.Value());
-                return TransactionReceipt::Parse(json);
+                Result<TransactionReceipt *> transactionReceipt = TransactionReceipt::Parse(json);
+                cJSON_Delete(json);
+                return transactionReceipt;
             }
         }
 
@@ -122,7 +124,9 @@ namespace blockchain
             {
                 cJSON *json = cJSON_Parse(result.Value());
                 free(result.Value());
-                return BlockInformation::Parse(json);
+                Result<BlockInformation *> blockInformation = BlockInformation::Parse(json);
+                cJSON_Delete(json);
+                return blockInformation;
             }
         }
 
@@ -136,7 +140,7 @@ namespace blockchain
         cJSON_AddStringToObject(callCJson, "from", callerAddress.AsString());
         cJSON_AddStringToObject(callCJson, "to", contractAddress.AsString());
         cJSON_AddStringToObject(callCJson, "data", dataAsHexString);
-        free(dataAsHexString);
+        delete []dataAsHexString;
 
         Result<char *> result = MakeRequst("eth_call", {callCJson, cJSON_CreateString("latest")});
 
@@ -172,7 +176,7 @@ namespace blockchain
             }
             gp = gasPriceResult.Value();
         }
-
+        
         char *parameter = transactionFactory->GenerateSerializedData(from, EthereumTransactionProperties(nonce, gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id));
         Result<char *> result = MakeRequst("eth_sendRawTransaction", {cJSON_CreateString(parameter)});
         delete[] parameter;
@@ -217,7 +221,7 @@ namespace blockchain
         if (result.HasValue())
         {
             Result<BigNumber> gasPrice(result.Value());
-            free(result.Value());
+            delete[] result.Value();
             return gasPrice;
         }
         return Result<BigNumber>::Err(result);
@@ -230,7 +234,7 @@ namespace blockchain
         if (result.HasValue())
         {
             BigNumber count(result.Value());
-            free(result.Value());
+            delete[] result.Value();
             return count;
         }
 
@@ -244,7 +248,7 @@ namespace blockchain
         if (result.HasValue())
         {
             BigNumber count(result.Value());
-            free(result.Value());
+            delete[] result.Value();
             return count;
         }
 

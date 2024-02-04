@@ -226,7 +226,7 @@ namespace blockchain
 
         char* retain_t::operator()(char *v)
         {
-            char *result = (char *)malloc(strlen(v) + 1);
+            char *result = new char[strlen(v) + 1];
             memccpy(result, v, 0, strlen(v));
             result[strlen(v)] = '\0';
             return result;
@@ -234,7 +234,7 @@ namespace blockchain
 
         char *copy_t::operator()(const char *v)
         {
-            char *result = (char *)malloc(strlen(v) + 1);
+            char *result = new char[strlen(v) + 1];
             memccpy(result, v, 0, strlen(v));
             result[strlen(v)] = '\0';
             return result;
