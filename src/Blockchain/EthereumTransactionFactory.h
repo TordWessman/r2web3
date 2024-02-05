@@ -28,7 +28,6 @@
 #include <vector>
 
 #include "../Shared/Common.h"
-#include "../Shared/R2Web3Log.h"
 #include "Account.h"
 #include "EthereumSigner.h"
 #include "Signer.h"
@@ -70,8 +69,7 @@ namespace blockchain
             std::vector<uint8_t> serializedTransaction = tx.Serialize();
 
             char *parameter = (serializedTransaction | byte_array::hex_string) | char_string::add_hex_prefix;
-            // TEMP:
-            Log::m("Transaciton data: ", parameter);
+
             return parameter;
         }
 

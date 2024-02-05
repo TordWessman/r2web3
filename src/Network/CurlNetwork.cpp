@@ -30,7 +30,7 @@
 
 namespace blockchain
 {
-    CurlNetwork::CurlNetwork()
+    CurlNetwork::CurlNetwork(const bool printDebug) : printDebug(printDebug)
     {
         curl_global_init(CURL_GLOBAL_DEFAULT);
         curlHandle = curl_easy_init();
@@ -85,8 +85,12 @@ namespace blockchain
         response = new char[responseBuffer.length() + 1];
         memcpy(response, responseBuffer.c_str(), responseBuffer.length());
         response[responseBuffer.length()] = '\0';
-        
-        //std::cout << "----- RAW RESPONSE: " << std::endl << response << std::endl;
+
+        if(printDebug)
+        {
+            std::cout << "----- RAW RESPONSE: " << std::endl
+                      << response << std::endl;
+        }
         
         return HttpResponse(httpCode, response);
     }

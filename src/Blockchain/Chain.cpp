@@ -176,8 +176,9 @@ namespace blockchain
             }
             gp = gasPriceResult.Value();
         }
-        
+
         char *parameter = transactionFactory->GenerateSerializedData(from, EthereumTransactionProperties(nonce, gp, gasLimit, to, amount, (contractCall ? contractCall->AsData() : std::vector<uint8_t>()), id));
+        
         Result<char *> result = MakeRequst("eth_sendRawTransaction", {cJSON_CreateString(parameter)});
         delete[] parameter;
 

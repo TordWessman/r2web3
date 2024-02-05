@@ -36,7 +36,7 @@ namespace blockchain
     class CurlNetwork : public NetworkFacade
     {
     public:
-        CurlNetwork();
+        CurlNetwork(const bool printDebug = false);
         ~CurlNetwork();
 
         HttpResponse MakeRequest(const char *url, const char *method, const char *body) const override;
@@ -45,6 +45,7 @@ namespace blockchain
         CurlNetwork(const CurlNetwork &other) = delete;
 
     private:
+        const bool printDebug;
         CURL *curlHandle;
         static size_t WriteCallback(void *contents, size_t size, size_t nmemb, std::string *output);
     };
