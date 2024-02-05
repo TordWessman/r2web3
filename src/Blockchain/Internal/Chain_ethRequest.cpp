@@ -25,6 +25,7 @@
 #include "../../Network/HttpResponse.h"
 #include "../../Network/HttpRequest.h"
 #include "../../Shared/R2Web3Log.h"
+#include "../../Shared/Common.h"
 #include "Chain_ethRequest.h"
 
 namespace blockchain
@@ -108,7 +109,7 @@ namespace blockchain
             if (resultJson != NULL)
             {
                 int code = cJSON_GetObjectItem(resultJson, "code")->valueint;
-                char *message = cJSON_GetObjectItem(resultJson, "message")->valuestring | char_string::retain;
+                char *message = cJSON_GetObjectItem(resultJson, "message")->valuestring;
                 Result<char *> result = Result<char *>::Err(code, message);
                 cJSON_Delete(response_json);
                 return result;
