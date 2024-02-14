@@ -45,8 +45,10 @@ namespace blockchain
     class Chain
     {
     public:
-        Chain(const char *rpcUrl, NetworkFacade *networkFacade) : url(rpcUrl), network(networkFacade), transactionFactory(new EthereumTransactionFactory()), id(0) {}
-        Chain(const char *rpcUrl, NetworkFacade *networkFacade, const uint32_t chainId) : url(rpcUrl), network(networkFacade), transactionFactory(new EthereumTransactionFactory()), id(chainId) {}
+        Chain(NetworkFacade *networkFacade) : url(nullptr), network(networkFacade), transactionFactory(new EthereumTransactionFactory()), id(0) {}
+        Chain(char *rpcUrl, NetworkFacade *networkFacade) : url(rpcUrl), network(networkFacade), transactionFactory(new EthereumTransactionFactory()), id(0) {}
+        Chain(const char *rpcUrl, NetworkFacade *networkFacade) : url(rpcUrl | char_string::copy), network(networkFacade), transactionFactory(new EthereumTransactionFactory()), id(0) {}
+        Chain(char *rpcUrl, NetworkFacade *networkFacade, const uint32_t chainId) : url(rpcUrl), network(networkFacade), transactionFactory(new EthereumTransactionFactory()), id(chainId) {}
 
         ~Chain() 
         {
@@ -56,6 +58,10 @@ namespace blockchain
         bool Start();
         bool Started() { return started; }
         uint32_t Id() { return id; }
+
+        /// @brief Manually set the RPC URL
+        /// @param newUrl
+        void SetRPCUrl(char *newUrl) { url = newUrl | char_string::retain; }
 
         /// @brief Return the chain id.
         /// @return 
@@ -124,7 +130,7 @@ namespace blockchain
 
     private:
         const EthereumTransactionFactory *transactionFactory;
-        const char *url;
+        char *url;
         NetworkFacade *network;
         uint32_t id;
         bool started;
