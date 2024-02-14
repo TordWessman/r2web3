@@ -60,7 +60,7 @@ namespace blockchain
 
         /// @brief Instantiate network client. Please note that `Restart` needs to be called if time sync is lost due to hibernation.
         /// @param certificate Optional root certificate.
-        ESPNetwork(const char *certificate = nullptr);
+        ESPNetwork(const char *certificate = nullptr, const bool printDebug = false);
 
         ~ESPNetwork()
         {
@@ -84,6 +84,7 @@ namespace blockchain
         mutable bool timeSyncRequired;
         mutable HTTPClient http;
         mutable WiFiClient *client;
+        const bool printDebug;
 #ifdef ESP8266
         mutable BearSSL::X509List trustedCAs;
 #endif

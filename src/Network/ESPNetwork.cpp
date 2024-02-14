@@ -32,7 +32,7 @@
 namespace blockchain
 {
 
-    ESPNetwork::ESPNetwork(const char *certificate)
+    ESPNetwork::ESPNetwork(const char *certificate, const bool printDebug) : printDebug(printDebug)
     {
         ntpServers = {ESPNetwork_NTP_SERVER1, ESPNetwork_NTP_SERVER2, ESPNetwork_NTP_SERVER3};
 #ifdef ESP32
@@ -103,6 +103,12 @@ namespace blockchain
             return HttpResponse(-3);
         }
 
+        if(printDebug)
+        {
+            Log::m("Sending request:", url);
+            Log::m("Request body:", body);
+        }
+
         http.begin(*client, url);
         http.addHeader("Content-Type", "application/json");
 
@@ -113,15 +119,15 @@ namespace blockchain
             Log::e("Connection error with code: ", httpResponseCode);
             return HttpResponse(httpResponseCode);
         }
-        else if (httpResponseCode != HTTP_CODE_OK)
+        else if (httpResponseCode != HTTP_CODE_OK && printDebug)
         {
             Log::e("Invalid response code: ", httpResponseCode);
-            Log::m(http.getString().c_str());
+            if (printDebug) { Log::m(http.getString().c_str()); }
         }
 
         String responseBody = http.getString();
-        // Serial.println("Response body:");
-        // Serial.println(responseBody);
+
+        if (printDebug) { Log::m("Response body:", responseBody.c_str()); }
 
         char *responseData = new char[responseBody.length() + 2];
         responseData[responseBody.length() + 1] = '\0';
