@@ -104,6 +104,7 @@ namespace blockchain
         TransactionReceipt(cJSON *result) : blockNumber(cJSON_GetObjectItemCaseSensitive(result, "blockNumber")->valuestring),
                                             cumulativeGasUsed(cJSON_GetObjectItemCaseSensitive(result, "cumulativeGasUsed")->valuestring),
                                             gasUsed(cJSON_GetObjectItemCaseSensitive(result, "gasUsed")->valuestring),
+                                            status(BigNumber(cJSON_GetObjectItemCaseSensitive(result, "status")->valuestring).ToUInt32() == 1),
                                             from(cJSON_GetObjectItemCaseSensitive(result, "from")->valuestring),
                                             to(cJSON_GetObjectItemCaseSensitive(result, "to")->valuestring)
         {
@@ -120,10 +121,11 @@ namespace blockchain
         BigNumber blockNumber;
         BigNumber cumulativeGasUsed;
         BigNumber gasUsed;
+        bool status;
         Address from;
         Address to;
 
-        #define TransactionReceipt_Keys "blockNumber", "cumulativeGasUsed", "gasUsed", "from", "to", "transactionHash"
+        #define TransactionReceipt_Keys "blockNumber", "cumulativeGasUsed", "gasUsed", "status", "from", "to", "transactionHash"
 
         static Result<TransactionReceipt *> Parse(cJSON *result)
         {
