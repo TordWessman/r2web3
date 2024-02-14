@@ -40,9 +40,13 @@ namespace blockchain
     {
     public:
 
-        /// @brief Instantiate using a private key. The account address and the public key will be derived from this.
+        /// @brief Instantiate using a private key. The account address and the public key will be derived from it.
         /// @param pk private key.
         Account(const char *pk) : privateKey(pk | byte_array::hex_string_to_bytes), address(Account::GenerateAddress(&privateKey)) {}
+
+        /// @brief Instantiate using a private key. The account address and the public key will be derived from it.
+        /// @param pk
+        Account(const std::vector<uint8_t> pk) : privateKey(pk), address(Account::GenerateAddress(&privateKey)) {}
 
         static Address GenerateAddress(const std::vector<uint8_t> *privateKey) 
         {
