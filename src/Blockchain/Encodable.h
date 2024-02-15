@@ -46,7 +46,7 @@ namespace blockchain
         Bool
     };
 
-    /// Shortcut for the creation of an encodable item.
+    /// Macro for `EncodableItem` constructors. (e.g. `ENC(aValue, "uint64")`).
     #define ENC EncodableItem
 
     /// @brief Represents an object prepared for encoding.

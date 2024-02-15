@@ -148,14 +148,13 @@ namespace blockchain
         {
             return Result<TransactionResponse>(result.Value());
         }
-        return Result<TransactionResponse>::Err(result.ErrorCode(), result.ErrorMessage());
+        return Result<TransactionResponse>::Err(result);
     }
 
     Result<TransactionResponse> Chain::Send(const Account *from, const Address to,
                                             const BigNumber amount, const uint32_t gasLimit,
                                             const BigNumber *gasPrice, const ContractCall *contractCall) const
     {
-        AssertStarted();
         Result<BigNumber> nonceResult = GetTransactionCount(from->GetAddress());
 
         if (!nonceResult.HasValue())
@@ -193,7 +192,6 @@ namespace blockchain
                                          const BigNumber amount, const uint32_t gasLimit,
                                          const BigNumber *gasPrice, const ContractCall *contractCall) const
     {
-        AssertStarted();
         Result<BigNumber> nonceResult = GetTransactionCount(from->GetAddress());
 
         if (!nonceResult.HasValue())

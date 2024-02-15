@@ -29,6 +29,43 @@
 
 namespace blockchain
 {
+    #define RLP_LENGTH_THRESHOLD 0x37
+    #define RLP_OFFSET_ARRAY_SHORT 0xc0
+    #define RLP_OFFSET_ARRAY_LONG 0xf7
+    #define RLP_OFFSET_ITEM_SHORT 0x80
+    #define RLP_OFFSET_ITEM_LONG 0xb7
+    #define RLP_MAX_LENGTH 0xff - RLP_OFFSET_ARRAY_LONG
+
+    // Packs the length information into an RLP header
+    std::vector<uint8_t> generateHeader(const size_t length)
+    {
+        std::vector<uint8_t> header;
+        size_t tmp = length;
+        while ((uint32_t)(tmp / 0x100) > 0)
+        {
+            header.push_back((uint8_t)(tmp % 0x100));
+            tmp = (uint32_t)(tmp / 0x100);
+        }
+        header.push_back((uint8_t)(tmp));
+        header.insert(header.begin(), RLP_OFFSET_ITEM_LONG + header.size());
+        return header;
+    }
+
+    // Reverse order of the original header
+    std::vector<uint8_t> reverseHeader(const std::vector<uint8_t> originalHeader)
+    {
+        assert(originalHeader.size() > 0);
+
+        std::vector<uint8_t> header;
+        header.push_back(originalHeader[0]);
+        const uint8_t hex = originalHeader.size() - 1;
+        for (int i = 0; i < hex; i++)
+        {
+            header.push_back(originalHeader[hex - i]);
+        }
+        return header;
+    }
+
     std::vector<uint8_t> RlpEncoder::Encode(const EncodableItem *item) const
     {
         if (item->Type() == EncodableItemType::ItemArray)
@@ -47,88 +84,66 @@ namespace blockchain
 
     std::vector<uint8_t> RlpEncoder::EncodeVector(const std::vector<EncodableItem> *items) const
     {
-        std::vector<uint8_t> result;
+        std::vector<uint8_t> encoded;
+
         for (EncodableItem item : *items)
         {
             std::vector<uint8_t> itemBytes = Encode(&item);
-            result.insert(result.end(), itemBytes.begin(), itemBytes.end());
+            encoded.insert(encoded.end(), itemBytes.begin(), itemBytes.end());
         }
 
-        size_t combinedCount = result.size();
+        size_t combinedCount = encoded.size();
 
-        if (combinedCount <= 55) 
+        if (combinedCount <= RLP_LENGTH_THRESHOLD)
         {
-            uint8_t sign = 0xC0 + (uint8_t)combinedCount;
-            result.insert(result.begin(), sign);
-            return result;
+            const uint8_t sign = RLP_OFFSET_ARRAY_SHORT + (uint8_t)combinedCount;
+            encoded.insert(encoded.begin(), sign);
+            return encoded;
         } 
         else 
         {
-            std::vector<uint8_t> length = (result.size() | byte_array::size_to_bytes) | byte_array::truncate;
+            std::vector<uint8_t> length = (encoded.size() | byte_array::size_to_bytes) | byte_array::truncate;
 
-            if (length.size() > 0xFF - 0xF7)
-            {
-                THROW("lengthCount to high.");
-            }
+            assert(length.size() < RLP_MAX_LENGTH);
 
-            uint8_t sign = 0xF7 + length.size();
+            const uint8_t sign = RLP_OFFSET_ARRAY_LONG + length.size();
 
             for (int i = 0; i < length.size(); i++) 
             {
-                result.insert(result.begin(), length[length.size() - i - 1]);
+                encoded.insert(encoded.begin(), length[length.size() - i - 1]);
             }
-            result.insert(result.begin(), sign);
+            encoded.insert(encoded.begin(), sign);
 
-            return result;
+            return encoded;
         }
     }
 
     std::vector<uint8_t> RlpEncoder::EncodeBytes(const std::vector<uint8_t> *bytes) const
     {
-        
-    ///TODO: Rewrite this
-        std::vector<uint8_t> result;
-        uint16_t inputLength = bytes->size();
-        if (inputLength == 1 && (*bytes)[0] == 0x00)
+        std::vector<uint8_t> encoded;
+        const size_t length = bytes->size();
+
+        if (length == 1 && (*bytes)[0] == 0x00)
         {
-            result.push_back(0x80);
+            encoded.push_back(RLP_OFFSET_ITEM_SHORT);
         }
-        else if (inputLength == 1 && (*bytes)[0] < 128)
+        else if (length == 1 && (*bytes)[0] < RLP_OFFSET_ITEM_SHORT)
         {
-            result.insert(result.end(), bytes->begin(), bytes->end());
+            encoded.insert(encoded.end(), bytes->begin(), bytes->end());
         }
-        else if (inputLength <= 55)
+        else if (length <= RLP_LENGTH_THRESHOLD)
         {
-            uint8_t _ = (uint8_t)0x80 + (uint8_t)inputLength;
-            result.push_back(_);
-            result.insert(result.end(), bytes->begin(), bytes->end());
+            encoded.push_back((uint8_t)RLP_OFFSET_ITEM_SHORT + (uint8_t)length);
+            encoded.insert(encoded.end(), bytes->begin(), bytes->end());
         }
         else
         {
-            std::vector<uint8_t> tmp_header;
-            uint32_t tmp = inputLength;
-            while ((uint32_t)(tmp / 256) > 0)
-            {
-                tmp_header.push_back((uint8_t)(tmp % 256));
-                tmp = (uint32_t)(tmp / 256);
-            }
-            tmp_header.push_back((uint8_t)(tmp));
-            uint8_t len = tmp_header.size(); // + 1;
-            tmp_header.insert(tmp_header.begin(), 0xb7 + len);
-
-            // fix direction for header
-            std::vector<uint8_t> header;
-            header.push_back(tmp_header[0]);
-            uint8_t hexdigit = tmp_header.size() - 1;
-            for (int i = 0; i < hexdigit; i++)
-            {
-                header.push_back(tmp_header[hexdigit - i]);
-            }
-
-            result.insert(result.end(), header.begin(), header.end());
-            result.insert(result.end(), bytes->begin(), bytes->end());
+            std::vector<uint8_t> header = generateHeader(length);
+            header = reverseHeader(header);
+            encoded.insert(encoded.end(), header.begin(), header.end());
+            encoded.insert(encoded.end(), bytes->begin(), bytes->end());
         }
-        return result;
 
+        return encoded;
     }
 }
