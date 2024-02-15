@@ -39,16 +39,16 @@ namespace blockchain
     public:
         virtual TransactionType GenerateTransaction(const TransactionProperties &properties, std::vector<uint8_t> *privateKey) const
     #ifndef ARDUINO
-        {  throw std::runtime_error("<>::GenerateTransaction() must be overloaded"); }
+        { THROW("<>::GenerateTransaction must be overridden"); }
     #else
             = 0;
     #endif
 
-        virtual char* GenerateSerializedData(const Account *account, const TransactionProperties properties) const
+        virtual char* GenerateSerializedData(const TransactionProperties properties, const Account *account) const
     #ifndef ARDUINO
-        {throw std::runtime_error("<>::GenerateTransaction() must be overloaded");}
+        { THROW("<>::GenerateSerializedData must be overridden"); }
     #else
-                = 0;
+          = 0;
     #endif
     };
 }

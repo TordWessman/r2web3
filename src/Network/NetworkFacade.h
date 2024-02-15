@@ -44,7 +44,7 @@ namespace blockchain
         virtual HttpResponse MakeRequest(const char *url, const char *method, const char *body) const
     #ifndef ARDUINO
         {
-            throw std::runtime_error("NetworkFacade::MakeRequest() must be overloaded");
+            THROW("NetworkFacade::MakeRequest() must be overloaded");
         }
     #else
             = 0;

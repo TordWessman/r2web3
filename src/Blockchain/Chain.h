@@ -74,13 +74,13 @@ namespace blockchain
         /// @param gasPrice
         /// @param gasLimit
         /// @param contractCall a `ContractCall` object for an RPC invocation or `nullptr` for a transaction. 
-        /// @return
+        /// @return The estimated gas fee for a transaction
         Result<BigNumber> EstimateGas(const Account *from, const Address to,
                                       const BigNumber amount, const uint32_t gasLimit,
                                       const BigNumber *gasPrice = nullptr, const ContractCall *contractCall = nullptr) const;
 
         /// @brief Return the current gas price.
-        /// @return 
+        /// @return Base gas price
         Result<BigNumber> GetGasPrice() const;
 
         /// @brief Returns the balance (in gwei) for the provided `account`.
@@ -118,12 +118,12 @@ namespace blockchain
                                         const BigNumber amount, const uint32_t gasLimit,
                                         const BigNumber *gasPrice = nullptr, const ContractCall *contractCall = nullptr) const;
 
-        /// @brief Returns a transaction `TransactionReceipt` for the specified transaction or `nulltype` if no transaction was found.
+        /// @brief Returns a transaction `TransactionReceipt` for the specified transaction or `nullptr` if no transaction was found.
         /// @param transactionHash
         /// @return `TransactionReceipt` or nullptr if no transaction was found.
         Result<TransactionReceipt*> GetTransactionReceipt(const char *transactionHash) const;
 
-        /// @brief Returns the `BlockInformation` of the block with the provided `blockHash` or `nulltype` if no block was found.
+        /// @brief Returns the `BlockInformation` of the block with the provided `blockHash` or `nullptr` if no block was found.
         /// @param blockHash
         /// @return `BlockInformation` or nullptr if no block was found.
         Result<BlockInformation*> GetBlockInformation(const char *blockHash) const;

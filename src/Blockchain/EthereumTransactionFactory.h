@@ -50,7 +50,7 @@ namespace blockchain
         /// @brief Creates and signs a transaction.
         /// @param properties Transaction information.
         /// @param privateKey Key used to sign the transaction.
-        /// @return A signed transaction.
+        /// @return A signed `EthereumTransaction`
         EthereumTransaction GenerateTransaction(const EthereumTransactionProperties &properties, std::vector<uint8_t> *privateKey) const override
         {
             EthereumTransaction t_unsigned(properties);
@@ -60,7 +60,11 @@ namespace blockchain
             return t_signed;
         }
 
-        char *GenerateSerializedData(const Account *account, const EthereumTransactionProperties properties) const override
+        /// @brief Uses the account's private key to create and sign an `EthereumTransaction`.
+        /// @param properties The transaction data to be signed and serialied.
+        /// @param account An account containing the signing key
+        /// @return the signed transaction as a hex string. This result must be manually deallocated after usage.
+        char *GenerateSerializedData(const EthereumTransactionProperties properties, const Account *account) const override
         {
             std::vector<uint8_t> pk = account->GetPrivateKey();
 

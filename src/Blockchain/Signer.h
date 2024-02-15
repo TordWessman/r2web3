@@ -51,14 +51,14 @@ namespace blockchain
                 /// @return a new, signed transaction.
                 virtual TransactionType Sign(const TransactionType *transaction, const std::vector<uint8_t> *privateKey) const
         #ifndef ARDUINO
-                { throw std::runtime_error("Signer::Sign(Transaction transaction) must be overloaded"); }
+                { THROW("Signer::Sign(Transaction transaction) must be overloaded"); }
         #else
                 = 0;
         #endif
 
                 virtual Signer *clone() const
         #ifndef ARDUINO
-                { throw std::runtime_error("Signer::clone() must be overloaded"); }
+                { THROW("Signer::clone() must be overloaded"); }
         #else
                 = 0;
         #endif

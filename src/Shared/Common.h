@@ -35,8 +35,7 @@
     #define THROW(message) _throwException_arduino(message)
 #else
     #include <stdexcept>
-    void _throwException(const char *message) { throw std::runtime_error(message); }
-    #define THROW(message) _throwException(message)
+    #define THROW(message) throw std::runtime_error(message)
 #endif
 
 namespace blockchain

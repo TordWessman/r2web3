@@ -28,6 +28,8 @@
 #include <vector>
 #include <stdint.h>
 
+#include "../Shared/Common.h"
+
 namespace blockchain
 {
     /// @brief Interface for a blockchain transaction.
@@ -39,7 +41,7 @@ namespace blockchain
         virtual std::vector<uint8_t> Serialize() const
     #ifndef ARDUINO
             {
-                throw std::runtime_error("Transaction::Serialize() must be overloaded");
+                THROW("Transaction::Serialize() must be overloaded");
             }
     #else
                 = 0;

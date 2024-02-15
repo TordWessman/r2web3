@@ -114,7 +114,7 @@ namespace blockchain
         virtual ~EncoderX() {}
         virtual EncoderX *clone() const
     #ifndef ARDUINO
-        { throw std::runtime_error("EncoderX::clone() must be overloaded"); }
+        { THROW("EncoderX::clone() must be overloaded"); }
     #else
             = 0;
     #endif
@@ -124,7 +124,7 @@ namespace blockchain
         /// @return A byte-array containing the serialized item.
         virtual std::vector<uint8_t> Encode(const EncodableItem *item) const
     #ifndef ARDUINO
-        { throw std::runtime_error("EncoderX::Encode(EncodableItem item) must be overloaded"); }; 
+        { THROW("EncoderX::Encode(EncodableItem item) must be overloaded"); }; 
     #else
             = 0;
     #endif
