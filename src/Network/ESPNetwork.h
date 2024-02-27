@@ -45,7 +45,7 @@
 
 #define ESPNetwork_NTP_SERVER1 "pool.ntp.org"
 #define ESPNetwork_NTP_SERVER2 "time.nist.gov"
-#define ESPNetwork_NTP_SERVER3 nullptr
+#define ESPNetwork_NTP_SERVER3 "se.pool.ntp.org"
 #define ESPNetwork_NTP_LOOP_TIME_MS 500
 #define ESPNetwork_NTP_LOOP_RETRIES 50
 #define ESPNetwork_CONNECTION_TIMEOUT 1000 * 10
