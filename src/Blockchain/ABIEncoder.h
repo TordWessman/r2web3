@@ -36,6 +36,7 @@ namespace blockchain
     {
     public:
         ABIEncoder() {}
+        ~ABIEncoder() override {}
 
         ABIEncoder *clone() const override { return new ABIEncoder(*this); }
 
