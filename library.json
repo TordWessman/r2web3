@@ -37,10 +37,10 @@
             "-I src",
             "-I src/Shared",
             "-I src/Blockchain",
-            "-I src/r2Common",
-            "-I src/r2Common/Network"
+            "-I src/r2Common/lib/r2common/src",
+            "-I src/r2Common/lib/r2common/src/Network"
         ],
-        "srcFilter": ["+<*>"],
+        "srcFilter": ["+<*>", "-<r2Common/src/>"],
         "libCompatMode": "strict"
     },
     "libLDFMode": "deep+"

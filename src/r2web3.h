@@ -26,14 +26,14 @@
 #define __R2_WEB3_H__
 
 #include "Shared/Common.h"
-#include "r2Common/R2Logger.h"
+#include "R2Logger.h"
 #include "Shared/BigNumber.h"
 #ifdef ARDUINO
-#include "r2Common/Network/ESPNetwork.h"
+#include "Network/ESPNetwork.h"
 #else
-#include "r2Common/Network/CurlNetwork.h"
+#include "Network/CurlNetwork.h"
 #endif
-#include "r2Common/Network/NetworkFacade.h"
+#include "Network/NetworkFacade.h"
 #include "Blockchain/Address.h"
 #include "Blockchain/Encodable.h"
 #include "Blockchain/Chain.h"

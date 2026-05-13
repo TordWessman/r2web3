@@ -27,7 +27,7 @@
 
 #include "../../Shared/Common.h"
 #include "../../Shared/cJSON.h"
-#include "../../r2Common/Network/NetworkFacade.h"
+#include "Network/NetworkFacade.h"
 
 namespace blockchain
 {

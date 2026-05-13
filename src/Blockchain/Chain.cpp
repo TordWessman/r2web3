@@ -23,8 +23,8 @@
  */
 
 #include "Chain.h"
-#include "../r2Common/Network/HttpRequest.h"
-#include "../r2Common/R2Logger.h"
+#include "Network/HttpRequest.h"
+#include "R2Logger.h"
 #include "Internal/Chain_ethRequest.h"
 
 #include <time.h>

@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-#include "../../r2Common/Network/HttpResponse.h"
-#include "../../r2Common/Network/HttpRequest.h"
-#include "../../r2Common/R2Logger.h"
+#include "Network/HttpResponse.h"
+#include "Network/HttpRequest.h"
+#include "R2Logger.h"
 #include "../../Shared/Common.h"
 #include "Chain_ethRequest.h"
 

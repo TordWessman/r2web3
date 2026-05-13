@@ -114,7 +114,7 @@ namespace r2common
         {
 #if defined(ESP32) && R2WEB3_HAS_CERT_BUNDLE
             client = new WiFiClientSecure();
-            ((WiFiClientSecure *)client)->setCACertBundle(arduino_esp_crt_bundle_attach);
+            ((WiFiClientSecure *)client)->setCACertBundle(NULL);
             timeSyncRequired = true;
             caCertAdded = true;
             R2Logger::m("Using Mozilla CA certificate bundle");

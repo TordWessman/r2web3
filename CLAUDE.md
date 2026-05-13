@@ -12,7 +12,7 @@ Uses **PlatformIO** with the Arduino framework. No Makefile or CMake.
 
 - **PlatformIO build**: `pio run` (or use Arduino IDE with the library installed in `~/Arduino/libraries/`)
 - **No formal test suite yet** — testing is manual via the example sketch
-- Include paths: `src`, `src/Shared`, `src/Blockchain`, `src/r2Common`, `src/r2Common/Network`
+- Include paths: `src`, `src/Shared`, `src/Blockchain`, `src/r2Common/lib/r2common/src`, `src/r2Common/lib/r2common/src/Network`
 
 ## Architecture
 
@@ -21,7 +21,7 @@ All public APIs are in the `blockchain::` namespace.
 ### Modules
 
 - **Blockchain** (`src/Blockchain/`): Core chain interaction — `Chain` is the main entry point for RPC calls (send transactions, view calls, balances, gas estimation). `Account` derives addresses from private keys via secp256k1. `EthereumTransaction` + `EthereumSigner` + `EthereumTransactionFactory` handle transaction creation, signing, and RLP serialization. `ContractCall` + `ABIEncoder` handle smart contract method encoding.
-- **r2Common** (`src/r2Common/`, git subtree from `r2common` repo): Self-contained `r2common::` namespace. `Result<T>` error monad, `NetworkFacade` interface with `ESPNetwork` (Arduino) and `CurlNetwork` (desktop) implementations, HTTP request/response types. Managed via `git subtree` — pull updates with `git subtree pull --prefix=src/r2Common r2common main --squash`, push changes back with `git subtree push --prefix=src/r2Common r2common main`.
+- **r2Common** (`src/r2Common/`, git subtree from `r2common` repo): Self-contained `r2common::` namespace. `Result<T>` error monad, `NetworkFacade` interface with `ESPNetwork` (Arduino) and `CurlNetwork` (desktop) implementations, HTTP request/response types. The r2common repo is a PlatformIO project; the subtree imports the whole repo at `src/r2Common/`, but library source files live at `src/r2Common/lib/r2common/src/`. The placeholder `src/r2Common/src/main.cpp` is excluded from compilation via srcFilter. Managed via `git subtree` — pull updates with `git subtree pull --prefix=src/r2Common r2common main --squash`, push changes back with `git subtree push --prefix=src/r2Common r2common main`. Includes use library-style paths (e.g. `#include "R2Logger.h"`, `#include "Network/NetworkFacade.h"`) resolved via build flags in `library.json`.
 - **Shared** (`src/Shared/`): `Common.h` has byte/string utilities with functional pipe operators (`|`). `BigNumber` for arbitrary-precision blockchain values. `R2Web3Log` singleton logger.
 - **Cryptography** (`src/cryptography/`): Bundled crypto primitives (secp256k1, Keccak-256, SHA-256, ECDSA, BIP32).
 
