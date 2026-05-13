@@ -1,0 +1,34 @@
+{
+    "name": "r2common",
+    "description": "Common C++ utilities for Arduino microcontrollers — HTTP networking and Result types",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/TordWessman/r2common"
+    },
+    "version": "0.0.1",
+    "authors": [
+        {
+            "name": "TordWessman",
+            "email": "tord@axelit.se",
+            "url": "https://axelit.se/"
+        }
+    ],
+    "includeDir": "src",
+    "srcDir": "src",
+    "frameworks": "*",
+    "platforms": [
+        "espressif8266",
+        "espressif32",
+        "atmelsam",
+        "native"
+    ],
+    "build": {
+        "flags": [
+            "-I src",
+            "-I src/Network"
+        ],
+        "srcFilter": ["+<*>"],
+        "libCompatMode": "off"
+    },
+    "libLDFMode": "deep+"
+}
