@@ -1,0 +1,6 @@
+.claude
+.pio
+.vscode
+.DS_Store
+CMakeLists.txt
+cmake-build-*/
