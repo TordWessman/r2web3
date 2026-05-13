@@ -40,7 +40,7 @@
             "-I src/r2Common/lib/r2common/src",
             "-I src/r2Common/lib/r2common/src/Network"
         ],
-        "srcFilter": ["+<*>", "-<r2Common/src/>"],
+        "srcFilter": ["+<*>", "-<r2Common/>"],
         "libCompatMode": "strict"
     },
     "libLDFMode": "deep+"
