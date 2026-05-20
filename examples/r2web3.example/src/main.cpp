@@ -47,8 +47,8 @@ CZMRJCQUzym+5iPDuI9yP+kHyCREU3qzuWFloUwOxkgAyXVjBYdwRVKD05WdRerw
 
 Account account(PRIVATE_KEY);
 Address contractAddress(CONTRACT_ADDRESS);
-ESPNetwork networkFacade(cert); // Use the ESP network stack.
-Chain chain("https://json-rpc.evm.testnet.shimmer.network", &networkFacade); // Use ShimmerEVM testnet.
+ESPNetwork network(cert); // Use the ESP network stack.
+Chain chain("https://json-rpc.evm.testnet.shimmer.network", &network); // Use ShimmerEVM testnet.
 
 void setup() {
 
