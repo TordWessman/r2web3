@@ -52,6 +52,7 @@ Chain chain("https://json-rpc.evm.testnet.shimmer.network", &network); // Use Sh
 
 void setup() {
 
+  /// @port serial:9600 bus
   Serial.begin(9600);
   WiFi.mode(WIFI_STA);
 
