@@ -7,14 +7,10 @@
 #include <WiFi.h>
 #endif
 #include <r2web3.h>
+#include "secrets.h" // Copy secrets_example.h to secrets.h and fill in your values.
 
 using namespace blockchain;
 using namespace r2common;
-
-#define SSID "<ssid>"
-#define WIFI_PASSWORD "<password>"
-#define PRIVATE_KEY "<private key>" // Account private key
-#define CONTRACT_ADDRESS "<contract address>" // Address to a deployed contract
 
 // Use CA Certificate for https.
 // The one below is valid for json-rpc.evm.testnet.shimmer.network.
